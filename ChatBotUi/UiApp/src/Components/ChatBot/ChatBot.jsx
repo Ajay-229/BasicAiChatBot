@@ -1,70 +1,100 @@
-// src/ChatApp.jsx
-import React, { useState } from 'react';
-import { ChatContainer, MessageList, Message, MessageInput, ConversationHeader } from '@chatscope/chat-ui-kit-react';
+import React, { useState } from "react";
+import {
+  MainContainer,
+  ChatContainer,
+  ConversationHeader,
+  MessageList,
+  Message,
+  Avatar,
+  MessageInput
+} from "@chatscope/chat-ui-kit-react";
 
-import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-
-const ChatApp = () => {
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import MainChatHeader from "./MainChatHeader";
+import botAvatar from "../../Assets/botAvatar.png"
+const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
-      message: "Hello, how can I assist you?",
-      sender: "chatbot",
-      direction: "incoming",
-      position: "single"
+      message: "Hello! How can I assist you?",
+      sender: "AI",
+      direction: "incoming"
     }
   ]);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendMessage = async (message) => {
-    // Add user message immediately
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { message, sender: "user", direction: "outgoing", position: "single" }
+  const handleSend = async (text) => {
+    // Add user message
+    setMessages((prev) => [
+      ...prev,
+      {
+        message: text,
+        sender: "user",
+        direction: "outgoing"
+      }
     ]);
 
-  console.log(message);
+    setIsTyping(true);
 
     try {
-      // Send user message to backend API
+      // Call backend API
       const response = await fetch("/api/chat", {
         method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
       });
 
       const data = await response.json();
 
-      // Add AI reply message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { message: data.reply, sender: "chatbot", direction: "incoming", position: "single" }
+      // Add bot reply
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: data.reply,
+          sender: "AI",
+          direction: "incoming"
+        }
       ]);
     } catch (error) {
-      console.error("Error sending message:", error);
-      // Optionally add an error message to chat UI
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { message: "Sorry, something went wrong.", sender: "chatbot", direction: "incoming", position: "single" }
+      // On error, add error message to chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: "Sorry, something went wrong.",
+          sender: "AI",
+          direction: "incoming"
+        }
       ]);
+      console.error("Error calling chat API:", error);
+    } finally {
+      setIsTyping(false);
     }
   };
 
   return (
-    <div style={{ height: "500px", width: "100%" }}>
+    <MainContainer>
+      <MainChatHeader /> {/* Your custom global header */}
+
       <ChatContainer>
         <ConversationHeader>
-          <ConversationHeader.Back />
-          <ConversationHeader.Content userName="ChatBot" info="Online" />
+          <Avatar src={botAvatar} name="AI Assistant" />
+          <ConversationHeader.Content
+            userName="AI Assistant"
+            info={isTyping ? "Typing..." : "Online"}
+          />
         </ConversationHeader>
-        <MessageList>
-          {messages.map((msg, index) => (
-            <Message key={index} model={msg} />
+
+        <MessageList typingIndicator={isTyping && <span>AI Assistant is typing...</span>}>
+          {messages.map((msg, idx) => (
+            <Message key={idx} model={msg} />
           ))}
         </MessageList>
-        <MessageInput placeholder="Type a message..." onSend={handleSendMessage} />
+
+        <MessageInput placeholder="Type a message..." onSend={handleSend} />
       </ChatContainer>
-    </div>
+    </MainContainer>
   );
 };
 
-export default ChatApp; 
+export default ChatBot;
