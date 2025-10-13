@@ -1,11 +1,11 @@
 // src/pages/Chat.jsx
 import React from 'react';
-import ChatApp from '../Components/ChatBot';
+import ChatBot from '../Components/ChatBot/ChatBot';
 
 const Chat = () => {
   return (
     <div>
-      <ChatApp />
+      <ChatBot />
     </div>
   );
 };

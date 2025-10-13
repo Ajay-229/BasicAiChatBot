@@ -1,34 +1,146 @@
 /* src/styles/Home.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
 .home {
-  background: url('https://source.unsplash.com/1600x900/?technology,ai') no-repeat center center/cover;
+  position: relative;
   height: 100vh;
+  width: 100vw;
+
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
+  background-color: black; /* Or any color to fill empty space */
+  
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
-  font-family: sans-serif;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.home::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%);
+  z-index: 0;
 }
 
 .home-content {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  padding: 50px 40px;
   text-align: center;
-  background-color: rgba(0,0,0,0.6);
-  padding: 40px;
+  background: transparent; /* remove old rgba bg */
   border-radius: 10px;
 }
 
-.home-buttons {
-  margin-top: 20px;
+.home-content h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
+}
+
+.home-content p {
+  font-size: 1.25rem;
+  margin-bottom: 35px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  color: #ddd;
 }
 
 .home-buttons button {
   margin: 0 10px;
-  padding: 10px 20px;
+  padding: 12px 30px;
   font-size: 16px;
   cursor: pointer;
+  border-radius: 25px;
+  border: none;
+  background-color: #007bff; /* vibrant blue */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,123,255,0.3);
 }
 
+.home-buttons button:hover:not(:disabled) {
+  background-color: #0056b3;
+  box-shadow: 0 6px 12px rgba(0,86,179,0.5);
+}
+
+.home-buttons button:disabled {
+  background-color: #666666;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.animated-btn {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(0,123,255,0.7);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0,123,255,1);
+  }
+}
+
+
 .footer {
-  margin-top: 40px;
-  font-size: 14px;
-  color: #ccc;
+  position: fixed;       /* Fix at bottom */
+  bottom: 10px;          /* Slightly above bottom edge */
+  left: 0;
+  width: 100%;           /* Full width */
+  text-align: center;    /* Center text */
+  font-size: 12px;       /* Smaller font size */
+  color: rgba(255, 255, 255, 0.7); /* Semi-transparent white for contrast */
+  pointer-events: none;  /* So it doesn't block clicks */
+  user-select: none;     /* Prevent text selection */
+  animation: fadeIn 2s ease forwards; /* Fade-in animation */
+  z-index: 10;           /* On top of other content */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .home-content {
+    max-width: 90%;
+    padding: 30px 20px;
+  }
+
+  .home-content h1 {
+    font-size: 2rem;
+  }
+
+  .home-content p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+
+  .home-buttons button {
+    padding: 10px 20px;
+    font-size: 14px;
+    margin: 5px 5px;
+    width: 100%;
+  }
+
+  .home-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
