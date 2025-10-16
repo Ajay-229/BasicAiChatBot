@@ -8,25 +8,28 @@
   flex-direction: column;
   overflow: hidden;
   background-color: #f9fafb;
+  border-radius: 10px;
 }
 
-/* Ensures smooth scroll & padding for messages */
+/* Smooth scroll and padding for messages */
 .chat-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.2rem 2rem;
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
+  transition: padding 0.3s ease;
 }
 
-/* Center messages in a narrower column */
+/* Center messages in a balanced column */
 .cs-message-list {
-  max-width: 600px;
+  max-width: 700px; /* slightly wider since wrapper is centered */
   margin: 0 auto;
+  width: 100%;
 }
 
-/* Optional animation for new messages */
+/* Optional fade animation for messages */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -42,19 +45,53 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* Responsive Tweaks */
-@media (max-width: 600px) {
-  .chat-wrapper {
-    padding: 0 0.5rem;
-  }
+/* =============================
+   Responsive Adjustments
+============================= */
 
+/* Large desktop screens */
+@media (min-width: 1600px) {
+  .cs-message-list {
+    max-width: 800px;
+  }
   .chat-scroll {
-    padding: 0.5rem;
+    padding: 1.5rem 3rem;
   }
 }
 
-@media (min-width: 900px) {
+/* Medium laptops (matches wrapper 70%→90%) */
+@media (max-width: 1280px) {
+  .cs-message-list {
+    max-width: 650px;
+  }
   .chat-scroll {
-    padding: 1.5rem;
+    padding: 1.2rem 1.5rem;
+  }
+}
+
+/* Tablets and small laptops */
+@media (max-width: 1024px) {
+  .chat-scroll {
+    padding: 1rem 1rem;
+  }
+  .cs-message-list {
+    max-width: 600px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 768px) {
+  .chat-scroll {
+    padding: 0.8rem;
+  }
+  .cs-message-list {
+    max-width: 100%;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .chat-scroll {
+    padding: 0.5rem;
   }
 }
