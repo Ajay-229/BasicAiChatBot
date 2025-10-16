@@ -1,13 +1,15 @@
-// src/pages/Chat.jsx
 import React from 'react';
-import ChatBot from '../Components/ChatBot/ChatBot';
+import ChatHeader from "../Components/ChatUI/ChatHeader";
+import ChatContainer from "../Components/ChatUI/ChatContainer";
+import ChatFooter from "../Components/ChatUI/ChatFooter";
+import "../styles/Chat.css";
 
-const Chat = () => {
+export default function Chat() {
   return (
-    <div>
-      <ChatBot />
+    <div className="chat-page">
+      <ChatHeader />
+      <ChatContainer />
+      <ChatFooter />
     </div>
   );
-};
-
-export default Chat;
+}

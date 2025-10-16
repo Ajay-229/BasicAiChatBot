@@ -1,0 +1,24 @@
+.chat-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  background-color: #f9f9fb;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.chat-scroll {
+  padding: 10px;
+  overflow-y: auto;
+  height: 100%;
+  scrollbar-width: thin;
+}
+
+/* Optional subtle scrollbar */
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+}

@@ -1,0 +1,33 @@
+.chat-footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-inner {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Optional minor tweak for ChatScope input */
+.cs-message-input {
+  border-radius: 20px !important;
+  border: 1px solid #ccc !important;
+}
+
+.cs-message-input__content-editor {
+  font-size: 15px !important;
+  padding: 10px 14px !important;
+}
+
+.cs-button--send {
+  background-color: #4a90e2 !important;
+  border-radius: 50% !important;
+}
+
+.cs-button--send:hover {
+  background-color: #3a7bd5 !important;
+}
