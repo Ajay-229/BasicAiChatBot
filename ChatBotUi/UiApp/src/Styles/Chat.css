@@ -1,6 +1,22 @@
+/* =============================
+   Global Chat Page Layout
+============================= */
+.chat-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Inner layout to hold header, chat area, and footer */
 .chat-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: #f9fafb;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
 }
