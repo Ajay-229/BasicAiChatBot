@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect } from "react";
 import {
   MainContainer,
   ChatContainer as CSChatContainer,
@@ -10,26 +10,27 @@ import MessageBubble from "./MessageBubble";
 import "../../styles/ChatContainer.css";
 
 const ChatContainer = ({ messages, isTyping }) => {
-  const messageListRef = useRef(null);
-
-  // 🧠 Auto-scroll to bottom when messages change
-  useEffect(() => {
-    if (messageListRef.current) {
-      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+  useLayoutEffect(() => {
+    // Find the message list container rendered by the kit
+    const messageListEl = document.querySelector(".custom-message-list");
+    if (messageListEl) {
+      // Always scroll to the latest message after render
+      messageListEl.scrollTo({
+        top: messageListEl.scrollHeight,
+        behavior: "smooth",
+      });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   return (
     <div className="chat-container">
       <MainContainer>
         <CSChatContainer>
-          {/* ✅ MessageList itself is scrollable */}
           <MessageList
-            ref={messageListRef}
             typingIndicator={
               isTyping ? <TypingIndicator content="AI is typing..." /> : null
             }
-            className="chat-scroll"
+            className="custom-message-list"
           >
             {messages.map((msg, index) => (
               <Message
@@ -37,7 +38,8 @@ const ChatContainer = ({ messages, isTyping }) => {
                 model={{
                   message: msg.text,
                   sender: msg.sender === "user" ? "You" : "AI",
-                  direction: msg.sender === "user" ? "outgoing" : "incoming",
+                  direction:
+                    msg.sender === "user" ? "outgoing" : "incoming",
                 }}
               >
                 <Message.CustomContent>

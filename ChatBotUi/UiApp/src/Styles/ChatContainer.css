@@ -1,56 +1,60 @@
 /* =============================
-   Chat Container Styling
+   Chat Container Layout Fix
 ============================= */
 
+/* Make the chat container take up the visible area (minus header/footer) */
 .chat-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden; /* prevent page scroll */
+  height: calc(100vh - 100px); /* adjust 100px based on your header/footer height */
+  overflow: hidden;
   background-color: #f9fafb;
   border-radius: 10px;
 }
 
-/* 🧩 Target ChatScope internal layout */
+/* Main and internal containers should not scroll */
 .chat-container .cs-main-container,
 .chat-container .cs-chat-container {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* ✅ Make only message list scrollable */
-.chat-container .cs-message-list {
+/* ✅ This ensures only MessageList scrolls */
+.custom-message-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1.2rem 2rem;
+  padding: 1rem 1.5rem 0.3rem 1.5rem;
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
-  scroll-behavior: smooth; /* 🧩 smooth scrolling */
+  scroll-behavior: smooth;
 }
 
-/* Custom scrollbar for WebKit */
-.chat-container .cs-message-list::-webkit-scrollbar {
+/* ✅ Custom Scrollbar Styling */
+.custom-message-list::-webkit-scrollbar {
   width: 8px;
 }
-.chat-container .cs-message-list::-webkit-scrollbar-thumb {
+.custom-message-list::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 4px;
 }
-.chat-container .cs-message-list::-webkit-scrollbar-thumb:hover {
+.custom-message-list::-webkit-scrollbar-thumb:hover {
   background: #aaa;
 }
 
-/* =============================
-   Message Animation
-============================= */
+/* Typing indicator spacing fix */
+.chat-container .cs-message-list__typing-indicator-container {
+  margin-top: 0.1rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* Fade animation for messages */
 .message-row {
   animation: fadeIn 0.3s ease;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -62,43 +66,28 @@
   }
 }
 
-/* =============================
-   Responsive Adjustments
-============================= */
-/* Extra Large Desktop (≥1600px) */
-@media (min-width: 1600px) {
-  .chat-container .cs-message-list {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-}
-
-/* Laptop (≤1280px) */
-@media (max-width: 1280px) {
-  .chat-container .cs-message-list {
-    max-width: 650px;
-  }
-}
-
-/* Tablet (≤1024px) */
+/* Responsive tweaks */
 @media (max-width: 1024px) {
-  .chat-container .cs-message-list {
-    max-width: 600px;
-    padding: 1rem 1rem;
+  .chat-container {
+    height: calc(100vh - 80px);
+  }
+  .custom-message-list {
+    padding: 1rem;
   }
 }
-
-/* Mobile (≤768px) */
 @media (max-width: 768px) {
-  .chat-container .cs-message-list {
-    max-width: 100%;
+  .chat-container {
+    height: calc(100vh - 60px);
+  }
+  .custom-message-list {
     padding: 0.8rem;
   }
 }
-
-/* Small Mobile (≤480px) */
 @media (max-width: 480px) {
-  .chat-container .cs-message-list {
-    padding: 0.5rem;
+  .chat-container {
+    height: calc(100vh - 50px);
+  }
+  .custom-message-list {
+    padding: 0.6rem;
   }
 }
