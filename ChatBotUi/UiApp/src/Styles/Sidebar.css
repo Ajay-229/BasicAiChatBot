@@ -1,0 +1,183 @@
+/* =============================
+   Sidebar Base Layout
+============================= */
+
+.sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  box-sizing: border-box;
+  transition: width 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Collapsed / Expanded widths */
+.sidebar.collapsed {
+  width: 70px;
+}
+.sidebar.expanded {
+  width: 240px;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+  font-size: 1.2rem;
+}
+.toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+/* New Chat Button */
+.new-chat-btn {
+  background-color: #0078ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+.new-chat-btn:hover {
+  background-color: #005fcc;
+}
+
+/* Icon-only (collapsed) */
+.icon-only {
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Expanded with text */
+.expanded-btn {
+  justify-content: flex-start;
+}
+
+.btn-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Sidebar Body (Future chat list area) */
+.sidebar-body {
+  margin-top: 1.5rem;
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.placeholder-text {
+  color: #777;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Scrollbar styling */
+.sidebar-body::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-body::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* =============================
+   Responsive Adjustments
+============================= */
+
+/* Laptop (≤1280px) */
+@media (max-width: 1280px) {
+  .sidebar.expanded {
+    width: 200px;
+  }
+  .sidebar.collapsed {
+    width: 60px;
+  }
+}
+
+/* Tablet / Small Laptop (≤1024px) */
+@media (max-width: 1024px) {
+  .sidebar.expanded {
+    width: 180px;
+  }
+  .sidebar.collapsed {
+    width: 55px;
+  }
+
+  .new-chat-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 999;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .toggle-btn {
+    position: absolute;
+    top: 1rem;
+    right: -2.5rem;
+    background-color: #0078ff;
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .new-chat-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .sidebar.expanded {
+    width: 160px;
+  }
+
+  .toggle-btn {
+    right: -2rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .new-chat-btn {
+    font-size: 0.8rem;
+  }
+}

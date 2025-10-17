@@ -1,33 +1,44 @@
 /* =============================
    Global Chat Page Layout
 ============================= */
+
+/* 🧱 Outer wrapper (centers everything, gives background + border) */
 .chat-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 70%;
   margin: 0 auto;
-  height: 100vh; /* full viewport height */
-  display: flex;
-  flex-direction: column;
-  background: #fafafa;
-  padding: 0 2rem;
+  height: 100vh;
+  background: #f4f5f7;
+  padding: 0;
   box-sizing: border-box;
   border-left: 1px solid #e0e0e0;
   border-right: 1px solid #e0e0e0;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
+  overflow: hidden; /* prevent full-page scroll */
+}
 
-  /* 🧩 Prevent full-page scroll */
+/* 🧩 Inner main layout — sidebar + chat area */
+.chat-layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  background: #fafafa;
+  border-radius: 12px;
   overflow: hidden;
 }
 
-/* Inner layout to hold header, chat area, and footer */
+/* 🗨️ Chat area container (holds header, messages, footer) */
 .chat-page {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  height: 100%;
-
-  /* 🧩 Important: contain internal scroll only inside chat area */
   overflow: hidden;
+  background-color: #fff;
 }
 
 /* =============================
@@ -53,10 +64,15 @@
   .chat-wrapper {
     width: 100%;
     max-width: 95%;
-    padding: 0 1rem;
     border: none;
     border-radius: 0;
     box-shadow: none;
+    padding: 0;
+  }
+
+  .chat-layout {
+    width: 95%;
+    height: 95vh;
   }
 }
 
@@ -67,6 +83,13 @@
     height: 100dvh;
     padding: 0.5rem;
     overflow: hidden;
+  }
+
+  .chat-layout {
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
   }
 
   .chat-page {

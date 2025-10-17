@@ -1,17 +1,17 @@
-// src/Pages/Chat.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import ChatHeader from "../Components/ChatUI/ChatHeader";
 import ChatContainer from "../Components/ChatUI/ChatContainer";
 import ChatFooter from "../Components/ChatUI/ChatFooter";
-import { saveMessages, loadMessages } from "../Utils/ChatStorage"; // 🆕 Import storage helpers
+import Sidebar from "../Components/ChatUI/Sidebar";
+import { saveMessages, loadMessages } from "../Utils/ChatStorage";
 import "../styles/Chat.css";
 
 export default function Chat() {
-  const [messages, setMessages] = useState([]); // user + AI messages
+  const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // 🧠 Load messages from sessionStorage when chat mounts
+  // 🧠 Load chat from sessionStorage
   useEffect(() => {
     const stored = loadMessages();
     if (stored.length > 0) {
@@ -19,32 +19,23 @@ export default function Chat() {
     }
   }, []);
 
-  /**
-   * Handles sending a new message to backend + updating UI
-   */
   const handleSend = useCallback(async (userMessage) => {
     if (!userMessage.trim()) return;
-
-    // 1️⃣ Add user message immediately
     setMessages((prev) => {
       const updated = [...prev, { sender: "user", text: userMessage }];
-      saveMessages(updated); // 🧩 Save to sessionStorage
+      saveMessages(updated);
       return updated;
     });
 
     try {
       setIsTyping(true);
-
-      // 2️⃣ Send to backend
       const response = await axios.post("http://localhost:8080/api/chat", {
         message: userMessage,
       });
-
-      // 3️⃣ Add AI reply
       const aiReply = response?.data?.reply || "No response from AI.";
       setMessages((prev) => {
         const updated = [...prev, { sender: "ai", text: aiReply }];
-        saveMessages(updated); // 🧩 Save after AI reply too
+        saveMessages(updated);
         return updated;
       });
     } catch (err) {
@@ -62,12 +53,21 @@ export default function Chat() {
     }
   }, []);
 
+  // 🆕 Clear chat + storage
+  const handleNewChat = () => {
+    setMessages([]);
+    sessionStorage.removeItem("chatMessages");
+  };
+
   return (
     <div className="chat-wrapper">
-      <div className="chat-page">
-        <ChatHeader />
-        <ChatContainer messages={messages} isTyping={isTyping} />
-        <ChatFooter onSend={handleSend} />
+      <div className="chat-layout">
+        <Sidebar onNewChat={handleNewChat} />
+        <div className="chat-page">
+          <ChatHeader />
+          <ChatContainer messages={messages} isTyping={isTyping} />
+          <ChatFooter onSend={handleSend} />
+        </div>
       </div>
     </div>
   );
