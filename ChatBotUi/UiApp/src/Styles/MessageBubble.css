@@ -4,15 +4,18 @@
 
 .message-row {
   display: flex;
+  flex-direction: column; /* ✅ Stack bubble + actions vertically */
   margin: 0.5rem 0;
+  width: 100%;
 }
 
+/* Different alignment for user vs AI */
 .message-row.user {
-  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .message-row.ai {
-  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .message-bubble {
@@ -36,6 +39,66 @@
   background-color: #f1f1f1;
   color: #333;
   border-bottom-left-radius: 4px;
+}
+
+/* ✅ Action bar (now sits below message) */
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  width: 70%; /* Aligns width with message bubble */
+}
+
+.message-row.user .message-actions {
+  justify-content: flex-end;
+}
+
+.message-row.ai .message-actions {
+  justify-content: flex-start;
+}
+
+/* Each icon block */
+.icon-wrapper {
+  position: relative;
+}
+
+/* Button base */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #4a90e2;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.icon-btn:hover .tooltip {
+  opacity: 1;
+
 }
 
 /* Tablets (≤1024px) */
@@ -62,5 +125,16 @@
     max-width: 95%;
     font-size: 0.85rem;
     padding: 0.5rem 0.7rem;
+  }
+}
+
+/* Smaller icons on mobile */
+@media (max-width: 480px) {
+  .icon-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .tooltip {
+    font-size: 0.65rem;
   }
 }
