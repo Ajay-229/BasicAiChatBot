@@ -1,49 +1,46 @@
 // src/Components/ChatUI/ChatFooter.jsx
-import React, { useState } from "react";
+import { React, useState, useRef } from "react";
 import { Send } from "@carbon/icons-react";
 import "../../styles/ChatFooter.css";
 
 const ChatFooter = ({ onSend }) => {
   const [message, setMessage] = useState("");
+  const textareaRef = useRef(null);
 
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "36px";
+      }
     }
   };
 
-  // Handle Enter key (send message)
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  // Auto-grow handler with compact reset
   const handleInput = (e) => {
     const textarea = e.target;
-    textarea.style.height = "auto"; // Reset first
-    const maxHeight = window.innerHeight * 0.3; // 30% of viewport
-
-    if (!textarea.value.trim()) {
-      // When empty → reset to compact height
-      textarea.style.height = "36px";
-    } else {
-      textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
-    }
+    textarea.style.height = "auto";
+    const maxHeight = window.innerHeight * 0.3;
+    textarea.style.height = textarea.value.trim()
+      ? Math.min(textarea.scrollHeight, maxHeight) + "px"
+      : "36px";
   };
 
   return (
     <footer className="chat-footer">
       <textarea
+        ref={textareaRef}
         className="chat-input"
         placeholder="Type your message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onInput={handleInput}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+          }
+        }}
         rows={1}
       />
       <button className="send-btn" onClick={handleSend}>
