@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Settings } from "@carbon/icons-react";
-import "../../styles/ChatHeader.css";
+import "../styles/ChatHeader.css";
 
 const ChatHeader = () => {
   const navigate = useNavigate();

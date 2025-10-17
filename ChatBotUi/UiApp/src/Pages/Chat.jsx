@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import ChatHeader from "../Components/ChatUI/ChatHeader";
+import ChatHeader from "../Components/ChatHeader";
 import ChatContainer from "../Components/ChatUI/ChatContainer";
 import ChatFooter from "../Components/ChatUI/ChatFooter";
-import Sidebar from "../Components/ChatUI/Sidebar";
+import Sidebar from "../Components/Sidebar";
 import { saveMessages, loadMessages } from "../Utils/ChatStorage";
 import "../styles/Chat.css";
 

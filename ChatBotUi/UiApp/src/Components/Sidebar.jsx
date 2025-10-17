@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Add, ChevronRight, ChevronLeft } from "@carbon/icons-react";
-import "../../styles/Sidebar.css";
+import "../styles/Sidebar.css";
 
 const Sidebar = ({ onNewChat }) => {
   const [isExpanded, setIsExpanded] = useState(false);
