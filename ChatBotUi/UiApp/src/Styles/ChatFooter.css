@@ -64,3 +64,26 @@
     padding-bottom: max(0.6rem, env(safe-area-inset-bottom));
   }
 }
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .chat-input {
+    font-size: 0.9rem;
+  }
+
+  .send-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .chat-footer {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .chat-footer {
+    padding: 0.4rem 0.5rem;
+  }
+}

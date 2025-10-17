@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   MainContainer,
   ChatContainer as CSChatContainer,
@@ -10,11 +10,27 @@ import MessageBubble from "./MessageBubble";
 import "../../styles/ChatContainer.css";
 
 const ChatContainer = ({ messages, isTyping }) => {
+  const messageListRef = useRef(null);
+
+  // 🧠 Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="chat-container">
       <MainContainer>
         <CSChatContainer>
-          <MessageList className="chat-scroll">
+          {/* ✅ MessageList itself is scrollable */}
+          <MessageList
+            ref={messageListRef}
+            typingIndicator={
+              isTyping ? <TypingIndicator content="AI is typing..." /> : null
+            }
+            className="chat-scroll"
+          >
             {messages.map((msg, index) => (
               <Message
                 key={index}
@@ -29,9 +45,6 @@ const ChatContainer = ({ messages, isTyping }) => {
                 </Message.CustomContent>
               </Message>
             ))}
-            {isTyping && (
-              <TypingIndicator content="AI is typing..." />
-            )}
           </MessageList>
         </CSChatContainer>
       </MainContainer>

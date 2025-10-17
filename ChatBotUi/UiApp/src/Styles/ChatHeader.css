@@ -59,20 +59,6 @@
   font-size: 0.9rem;
 }
 
-@media (max-width: 600px) {
-  .back-text {
-    display: none;
-  }
-
-  .chat-title {
-    font-size: 1rem;
-  }
-
-  .chat-header {
-    padding: 0.5rem 0.75rem;
-  }
-}
-
 /* Optional slight fade-in animation */
 @keyframes fadeDown {
   from {
@@ -87,4 +73,30 @@
 
 .chat-header {
   animation: fadeDown 0.3s ease;
+}
+
+/* Mobile (≤600px) */
+@media (max-width: 600px) {
+  .back-text {
+    display: none;
+  }
+
+  .chat-title {
+    font-size: 1rem;
+  }
+
+  .chat-header {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .chat-title {
+    font-size: 0.9rem;
+  }
 }

@@ -37,3 +37,30 @@
   color: #333;
   border-bottom-left-radius: 4px;
 }
+
+/* Tablets (≤1024px) */
+@media (max-width: 1024px) {
+  .message-bubble {
+    max-width: 80%;
+    font-size: 0.95rem;
+    padding: 0.7rem 0.9rem;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .message-bubble {
+    max-width: 90%;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .message-bubble {
+    max-width: 95%;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+  }
+}

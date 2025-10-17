@@ -6,30 +6,51 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  height: 100%;
+  overflow: hidden; /* prevent page scroll */
   background-color: #f9fafb;
   border-radius: 10px;
 }
 
-/* Smooth scroll and padding for messages */
-.chat-scroll {
+/* 🧩 Target ChatScope internal layout */
+.chat-container .cs-main-container,
+.chat-container .cs-chat-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ Make only message list scrollable */
+.chat-container .cs-message-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1.2rem 2rem;
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
-  transition: padding 0.3s ease;
+  scroll-behavior: smooth; /* 🧩 smooth scrolling */
 }
 
-/* Center messages in a balanced column */
-.cs-message-list {
-  max-width: 700px; /* slightly wider since wrapper is centered */
-  margin: 0 auto;
-  width: 100%;
+/* Custom scrollbar for WebKit */
+.chat-container .cs-message-list::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-container .cs-message-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+.chat-container .cs-message-list::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
 }
 
-/* Optional fade animation for messages */
+/* =============================
+   Message Animation
+============================= */
+.message-row {
+  animation: fadeIn 0.3s ease;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -41,57 +62,43 @@
   }
 }
 
-.message-row {
-  animation: fadeIn 0.3s ease;
-}
-
 /* =============================
    Responsive Adjustments
 ============================= */
-
-/* Large desktop screens */
+/* Extra Large Desktop (≥1600px) */
 @media (min-width: 1600px) {
-  .cs-message-list {
+  .chat-container .cs-message-list {
     max-width: 800px;
-  }
-  .chat-scroll {
-    padding: 1.5rem 3rem;
+    margin: 0 auto;
   }
 }
 
-/* Medium laptops (matches wrapper 70%→90%) */
+/* Laptop (≤1280px) */
 @media (max-width: 1280px) {
-  .cs-message-list {
+  .chat-container .cs-message-list {
     max-width: 650px;
   }
-  .chat-scroll {
-    padding: 1.2rem 1.5rem;
-  }
 }
 
-/* Tablets and small laptops */
+/* Tablet (≤1024px) */
 @media (max-width: 1024px) {
-  .chat-scroll {
+  .chat-container .cs-message-list {
+    max-width: 600px;
     padding: 1rem 1rem;
   }
-  .cs-message-list {
-    max-width: 600px;
-  }
 }
 
-/* Mobile phones */
+/* Mobile (≤768px) */
 @media (max-width: 768px) {
-  .chat-scroll {
+  .chat-container .cs-message-list {
+    max-width: 100%;
     padding: 0.8rem;
   }
-  .cs-message-list {
-    max-width: 100%;
-  }
 }
 
-/* Very small screens */
+/* Small Mobile (≤480px) */
 @media (max-width: 480px) {
-  .chat-scroll {
+  .chat-container .cs-message-list {
     padding: 0.5rem;
   }
 }
