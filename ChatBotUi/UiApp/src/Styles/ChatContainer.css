@@ -1,18 +1,17 @@
-/* =============================
-   Chat Container Layout Fix
-============================= */
+/* ==============================
+   Clean Chat Layout (Final)
+============================== */
 
-/* Make the chat container take up the visible area (minus header/footer) */
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px); /* adjust 100px based on your header/footer height */
-  overflow: hidden;
+  height: calc(100vh - 100px); /* adjust for header/footer */
   background-color: #f9fafb;
   border-radius: 10px;
+  overflow: hidden;
 }
 
-/* Main and internal containers should not scroll */
+/* Make internal ChatScope containers fill full height */
 .chat-container .cs-main-container,
 .chat-container .cs-chat-container {
   display: flex;
@@ -21,19 +20,35 @@
   overflow: hidden;
 }
 
-/* ✅ This ensures only MessageList scrolls */
+/* ✅ Only MessageList scrolls */
 .custom-message-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1rem 1.5rem 0.3rem 1.5rem;
+  padding: 1rem 1.5rem;
   box-sizing: border-box;
+  scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
-  scroll-behavior: smooth;
 }
 
-/* ✅ Custom Scrollbar Styling */
+/* ✅ Fix unwanted blank space from ChatScope internal wrapper */
+.cs-message-list__scroll-wrapper {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ✅ Hide typing indicator container when empty */
+.cs-message-list__typing-indicator-container:empty {
+  display: none !important;
+}
+
+/* ✅ Custom scrollbar styling */
 .custom-message-list::-webkit-scrollbar {
   width: 8px;
 }
@@ -45,13 +60,7 @@
   background: #aaa;
 }
 
-/* Typing indicator spacing fix */
-.chat-container .cs-message-list__typing-indicator-container {
-  margin-top: 0.1rem !important;
-  margin-bottom: 0 !important;
-}
-
-/* Fade animation for messages */
+/* ✅ Fade animation for message appearance */
 .message-row {
   animation: fadeIn 0.3s ease;
 }
@@ -66,28 +75,27 @@
   }
 }
 
-/* Responsive tweaks */
+/* ✅ Prevent page scroll — only chat scrolls */
+html,
+body {
+  overflow: hidden;
+}
+
+/* ==========================
+   Responsive Height Adjustments
+========================== */
 @media (max-width: 1024px) {
   .chat-container {
     height: calc(100vh - 80px);
-  }
-  .custom-message-list {
-    padding: 1rem;
   }
 }
 @media (max-width: 768px) {
   .chat-container {
     height: calc(100vh - 60px);
   }
-  .custom-message-list {
-    padding: 0.8rem;
-  }
 }
 @media (max-width: 480px) {
   .chat-container {
     height: calc(100vh - 50px);
-  }
-  .custom-message-list {
-    padding: 0.6rem;
   }
 }
