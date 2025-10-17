@@ -1,13 +1,23 @@
-import React, { useState, useCallback } from "react";
+// src/Pages/Chat.jsx
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import ChatHeader from "../Components/ChatUI/ChatHeader";
 import ChatContainer from "../Components/ChatUI/ChatContainer";
 import ChatFooter from "../Components/ChatUI/ChatFooter";
+import { saveMessages, loadMessages } from "../Utils/ChatStorage"; // 🆕 Import storage helpers
 import "../styles/Chat.css";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]); // user + AI messages
   const [isTyping, setIsTyping] = useState(false);
+
+  // 🧠 Load messages from sessionStorage when chat mounts
+  useEffect(() => {
+    const stored = loadMessages();
+    if (stored.length > 0) {
+      setMessages(stored);
+    }
+  }, []);
 
   /**
    * Handles sending a new message to backend + updating UI
@@ -16,7 +26,11 @@ export default function Chat() {
     if (!userMessage.trim()) return;
 
     // 1️⃣ Add user message immediately
-    setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
+    setMessages((prev) => {
+      const updated = [...prev, { sender: "user", text: userMessage }];
+      saveMessages(updated); // 🧩 Save to sessionStorage
+      return updated;
+    });
 
     try {
       setIsTyping(true);
@@ -28,16 +42,21 @@ export default function Chat() {
 
       // 3️⃣ Add AI reply
       const aiReply = response?.data?.reply || "No response from AI.";
-      setMessages((prev) => [...prev, { sender: "ai", text: aiReply }]);
+      setMessages((prev) => {
+        const updated = [...prev, { sender: "ai", text: aiReply }];
+        saveMessages(updated); // 🧩 Save after AI reply too
+        return updated;
+      });
     } catch (err) {
       console.error("Backend error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: "⚠️ Could not reach AI service. Please try again.",
-        },
-      ]);
+      setMessages((prev) => {
+        const updated = [
+          ...prev,
+          { sender: "ai", text: "⚠️ Could not reach AI service. Please try again." },
+        ];
+        saveMessages(updated);
+        return updated;
+      });
     } finally {
       setIsTyping(false);
     }
