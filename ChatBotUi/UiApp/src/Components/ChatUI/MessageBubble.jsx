@@ -1,4 +1,3 @@
-// src/Components/ChatUI/MessageBubble.jsx
 import React from "react";
 import { Copy as CopyIcon } from "@carbon/icons-react";
 import "../../styles/MessageBubble.css";
@@ -16,12 +15,13 @@ const MessageBubble = ({ sender, text }) => {
 
   return (
     <div className={`message-row ${isUser ? "user" : "ai"}`}>
-      <div className="message-bubble">
-        <p>{text}</p>
+      <div className={`message-bubble ${isUser ? "user-bubble" : "ai-bubble"}`}>
+        {/* ✅ Preserve formatting (newlines, tabs, spaces) */}
+        <pre className="message-text">{text}</pre>
       </div>
 
-      {/* ✅ Action bar — one line for all icons */}
-      <div className="message-actions">
+      {/* ✅ Actions below bubble */}
+      <div className={`message-actions ${isUser ? "user-actions" : "ai-actions"}`}>
         <div className="icon-wrapper">
           <button onClick={handleCopy} className="icon-btn">
             <CopyIcon size={16} />
