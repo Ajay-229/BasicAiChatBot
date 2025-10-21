@@ -18,9 +18,32 @@ public class ChatController {
     private static final Dotenv dotenv = Dotenv.load();
     private static final String HF_API_TOKEN = dotenv.get("HUGGINGFACE_API_TOKEN");
 
-    @PostMapping
-    public ChatResponse chat(@RequestBody ChatRequest request) {
-        System.out.println("📩 Received chat with " + request.getMessages().size() + " messages");
+    // 🧠 In-memory chat session store
+    private final Map<String, List<Map<String, Object>>> sessionStore = new HashMap<>();
+
+    // 🆕 Start a new chat session
+    @PostMapping("/new")
+    public Map<String, String> createNewSession() {
+        String sessionId = UUID.randomUUID().toString();
+        sessionStore.put(sessionId, new ArrayList<>());
+        System.out.println("🆕 Created new chat session: " + sessionId);
+        return Map.of("sessionId", sessionId);
+    }
+
+    // 💬 Handle chat messages for a specific session
+    @PostMapping("/{sessionId}")
+    public ChatResponse chat(@PathVariable String sessionId, @RequestBody ChatRequest request) {
+        System.out.println("📩 Received chat for session: " + sessionId);
+
+        // Store messages in memory
+        List<Map<String, Object>> sessionMessages =
+                sessionStore.computeIfAbsent(sessionId, k -> new ArrayList<>());
+
+        // ✅ Convert List<Map<String, String>> → List<Map<String, Object>>
+        for (Map<String, String> msg : request.getMessages()) {
+            Map<String, Object> converted = new HashMap<>(msg);
+            sessionMessages.add(converted);
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -28,7 +51,7 @@ public class ChatController {
 
         Map<String, Object> body = new HashMap<>();
         body.put("model", "deepseek-ai/DeepSeek-V3.2-Exp:novita");
-        body.put("messages", request.getMessages()); // ✅ full chat history
+        body.put("messages", sessionMessages);
         body.put("stream", false);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
@@ -49,6 +72,9 @@ public class ChatController {
                     Map<String, Object> firstChoice = choices.get(0);
                     Map<String, String> messageObj = (Map<String, String>) firstChoice.get("message");
                     reply = messageObj.get("content");
+
+                    // Store AI reply in session
+                    sessionMessages.add(Map.of("role", "assistant", "content", reply));
                 } else {
                     reply = "⚠️ No response from model.";
                 }
@@ -61,5 +87,19 @@ public class ChatController {
         }
 
         return new ChatResponse(reply);
+    }
+
+    // 📜 Get chat history for a session
+    @GetMapping("/{sessionId}")
+    public List<Map<String, Object>> getSession(@PathVariable String sessionId) {
+        return sessionStore.getOrDefault(sessionId, new ArrayList<>());
+    }
+
+    // 🗑️ Delete a chat session
+    @DeleteMapping("/{sessionId}")
+    public Map<String, String> deleteSession(@PathVariable String sessionId) {
+        sessionStore.remove(sessionId);
+        System.out.println("🗑️ Deleted chat session: " + sessionId);
+        return Map.of("message", "Session cleared successfully");
     }
 }
