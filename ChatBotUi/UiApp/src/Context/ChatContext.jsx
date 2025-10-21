@@ -1,6 +1,7 @@
+// src/Context/ChatContext.js
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
-import axios from "axios";
 import { saveMessages, loadMessages } from "../Utils/ChatStorage";
+import { chatApi } from "../Utils/Api/ChatApi";
 
 const ChatContext = createContext();
 
@@ -9,7 +10,7 @@ export const ChatProvider = ({ children }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
-  // 🧠 Load chat and sessionId from sessionStorage
+  // 🧠 Load chat + session from sessionStorage
   useEffect(() => {
     const storedMessages = loadMessages();
     const storedSession = sessionStorage.getItem("chatSessionId");
@@ -21,14 +22,13 @@ export const ChatProvider = ({ children }) => {
   // 🆕 Create new session
   const createNewSession = async () => {
     try {
-      const res = await axios.post("http://localhost:8080/api/chat/new");
-      const newSessionId = res.data.sessionId;
+      const newSessionId = await chatApi.createSession();
       setSessionId(newSessionId);
       sessionStorage.setItem("chatSessionId", newSessionId);
-      console.log("🆕 New chat session:", newSessionId);
+      console.log("🆕 New session:", newSessionId);
       return newSessionId;
     } catch (error) {
-      console.error("Failed to create new chat session:", error);
+      console.error("Session creation failed:", error);
     }
   };
 
@@ -44,26 +44,21 @@ export const ChatProvider = ({ children }) => {
       try {
         setIsTyping(true);
 
-        // Ensure sessionId exists
+        // Ensure session exists
         let activeSession = sessionId;
-        if (!activeSession) {
-          activeSession = await createNewSession();
-        }
+        if (!activeSession) activeSession = await createNewSession();
 
+        // Convert message to backend format
         const formattedMessages = [{ role: "user", content: userMessage }];
 
-        const response = await axios.post(
-          `http://localhost:8080/api/chat/${activeSession}`,
-          { messages: formattedMessages }
-        );
-
-        const aiReply = response?.data?.reply || "No response from AI.";
+        // Call backend via chatApi
+        const aiReply = await chatApi.sendMessage(activeSession, formattedMessages);
 
         const updated = [...newMessages, { sender: "ai", text: aiReply }];
         setMessages(updated);
         saveMessages(updated);
-      } catch (err) {
-        console.error("Backend error:", err);
+      } catch (error) {
+        console.error("Backend error:", error);
         const fallback = [
           ...messages,
           { sender: "ai", text: "⚠️ Could not reach AI service. Please try again." },
@@ -77,15 +72,13 @@ export const ChatProvider = ({ children }) => {
     [messages, sessionId]
   );
 
-  // 🆕 New Chat logic
+  // 🧹 New Chat
   const handleNewChat = async () => {
-    // Remove old data
     setMessages([]);
     saveMessages([]);
     sessionStorage.removeItem("chatMessages");
     sessionStorage.removeItem("chatSessionId");
 
-    // Ask backend for a fresh session
     const newSession = await createNewSession();
     setSessionId(newSession);
   };
