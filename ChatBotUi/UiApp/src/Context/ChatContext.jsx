@@ -1,7 +1,8 @@
 // src/Context/ChatContext.js
-import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
-import { saveMessages, loadMessages } from "../Utils/ChatStorage";
+import React, { createContext, useState, useEffect, useCallback, useContext, useRef } from "react";
+import { saveMessages, loadMessages, clearMessages } from "../Utils/ChatStorage";
 import { chatApi } from "../Utils/Api/ChatApi";
+import { v4 as uuidv4 } from "uuid";
 
 const ChatContext = createContext();
 
@@ -10,16 +11,31 @@ export const ChatProvider = ({ children }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
-  // 🧠 Load chat + session from sessionStorage
-  useEffect(() => {
-    const storedMessages = loadMessages();
-    const storedSession = sessionStorage.getItem("chatSessionId");
+  // Keep a ref to latest isTyping for safety inside callbacks
+  const isTypingRef = useRef(isTyping);
+  useEffect(() => { isTypingRef.current = isTyping; }, [isTyping]);
 
-    if (storedMessages.length > 0) setMessages(storedMessages);
+  // Load messages from storage and ensure stable ids exist
+  useEffect(() => {
+    const stored = loadMessages();
+    // If messages in storage don't have ids (older format), assign them
+    const normalized = stored.map((m) => {
+      if (!m.id) {
+        // preserve possible parentId if present; otherwise add id
+        return { ...m, id: uuidv4() };
+      }
+      return m;
+    });
+
+    if (normalized.length > 0) {
+      setMessages(normalized);
+      saveMessages(normalized);
+    }
+
+    const storedSession = sessionStorage.getItem("chatSessionId");
     if (storedSession) setSessionId(storedSession);
   }, []);
 
-  // 🆕 Create new session
   const createNewSession = async () => {
     try {
       const newSessionId = await chatApi.createSession();
@@ -32,51 +48,118 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // ✉️ Send message
+  // send a user message, create user message id, create AI reply with parentId
   const handleSend = useCallback(
     async (userMessage) => {
-      if (!userMessage.trim()) return;
+      if (!userMessage || !userMessage.trim()) return;
 
-      const newMessages = [...messages, { sender: "user", text: userMessage }];
-      setMessages(newMessages);
-      saveMessages(newMessages);
+      // Build user message with stable id
+      const userMsg = { id: uuidv4(), sender: "user", text: userMessage, createdAt: new Date().toISOString() };
+
+      // Add user message immediately (functional update so we don't rely on captured 'messages')
+      setMessages((prev) => {
+        const next = [...prev, userMsg];
+        saveMessages(next);
+        return next;
+      });
 
       try {
         setIsTyping(true);
-
-        // Ensure session exists
         let activeSession = sessionId;
         if (!activeSession) activeSession = await createNewSession();
-
-        // Convert message to backend format
+        // createCancelSource handled inside chatApi.sendMessage
         const formattedMessages = [{ role: "user", content: userMessage }];
 
-        // Call backend via chatApi
         const aiReply = await chatApi.sendMessage(activeSession, formattedMessages);
 
-        const updated = [...newMessages, { sender: "ai", text: aiReply }];
-        setMessages(updated);
-        saveMessages(updated);
+        // If request was canceled, aiReply === null
+        if (aiReply === null) {
+          // request cancelled (delete likely already handled)
+          setIsTyping(false);
+          return;
+        }
+
+        const aiMsg = {
+          id: uuidv4(),
+          sender: "ai",
+          text: aiReply,
+          createdAt: new Date().toISOString(),
+          parentId: userMsg.id,
+        };
+
+        // Append AI reply
+        setMessages((prev) => {
+          const next = [...prev, aiMsg];
+          saveMessages(next);
+          return next;
+        });
       } catch (error) {
         console.error("Backend error:", error);
-        const fallback = [
-          ...messages,
-          { sender: "ai", text: "⚠️ Could not reach AI service. Please try again." },
-        ];
-        setMessages(fallback);
-        saveMessages(fallback);
+        // Append fallback AI error message after the user message
+        const fallback = {
+          id: uuidv4(),
+          sender: "ai",
+          text: "⚠️ Could not reach AI service. Please try again.",
+          parentId: userMsg.id,
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => {
+          const next = [...prev, fallback];
+          saveMessages(next);
+          return next;
+        });
       } finally {
         setIsTyping(false);
       }
     },
-    [messages, sessionId]
+    [sessionId]
   );
 
-  // 🧹 New Chat
+  // Delete by message id (stable)
+  // Delete by message id (stable)
+const handleDeleteMessage = useCallback(
+  (messageId) => {
+    setMessages((prevMessages) => {
+      const target = prevMessages.find((m) => m.id === messageId);
+      if (!target) return prevMessages;
+
+      let updated = [...prevMessages];
+
+      // 🟦 CASE 1: User message deletion
+      if (target.sender === "user") {
+        // If AI is typing a response for this user message
+        if (isTypingRef.current && updated[updated.length - 1].id === messageId) {
+          chatApi.cancelMessage(); // stops backend
+          setIsTyping(false);      // stops typing indicator
+        }
+
+        // 🗑️ Delete the user message itself
+        updated = updated.filter((m) => m.id !== messageId);
+
+        // 🗑️ Also delete any AI reply with parentId === user message id
+        updated = updated.filter((m) => m.parentId !== messageId);
+      } 
+      // 🟩 CASE 2: AI message deletion (edge case)
+      else if (target.sender === "ai" && target.parentId) {
+        // Delete both AI message and its linked user message
+        updated = updated.filter(
+          (m) => m.id !== target.id && m.id !== target.parentId
+        );
+      }
+
+      saveMessages(updated); // persist updated list
+      return updated;
+    });
+
+    setIsTyping(false); // safety reset
+  },
+  []
+);
+
   const handleNewChat = async () => {
     setMessages([]);
     saveMessages([]);
-    sessionStorage.removeItem("chatMessages");
+    clearMessages();
     sessionStorage.removeItem("chatSessionId");
 
     const newSession = await createNewSession();
@@ -85,7 +168,13 @@ export const ChatProvider = ({ children }) => {
 
   return (
     <ChatContext.Provider
-      value={{ messages, isTyping, handleSend, handleNewChat }}
+      value={{
+        messages,
+        isTyping,
+        handleSend,
+        handleNewChat,
+        handleDeleteMessage,
+      }}
     >
       {children}
     </ChatContext.Provider>

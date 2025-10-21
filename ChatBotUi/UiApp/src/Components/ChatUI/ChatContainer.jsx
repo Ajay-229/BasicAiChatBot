@@ -12,12 +12,11 @@ import "../../styles/ChatContainer.css";
 const ChatContainer = ({ messages, isTyping }) => {
   const messageListRef = useRef(null);
 
-  // ✅ Auto-scroll + space fix after render
+  // ✅ Auto-scroll + layout fix
   useLayoutEffect(() => {
     const messageListEl = document.querySelector(".custom-message-list");
 
     if (messageListEl) {
-      // Ensure no extra space below
       const wrapper = messageListEl.querySelector(".cs-message-list__scroll-wrapper");
       if (wrapper) {
         wrapper.style.height = "auto";
@@ -28,7 +27,6 @@ const ChatContainer = ({ messages, isTyping }) => {
         wrapper.style.margin = "0";
       }
 
-      // ✅ Smooth auto-scroll to bottom when new message appears
       messageListEl.scrollTo({
         top: messageListEl.scrollHeight,
         behavior: "smooth",
@@ -47,9 +45,9 @@ const ChatContainer = ({ messages, isTyping }) => {
             }
             className="custom-message-list"
           >
-            {messages.map((msg, index) => (
+            {messages.map((msg) => (
               <Message
-                key={index}
+                key={msg.id || msg.text} // ✅ use stable id
                 model={{
                   message: msg.text,
                   sender: msg.sender === "user" ? "You" : "AI",
@@ -57,7 +55,7 @@ const ChatContainer = ({ messages, isTyping }) => {
                 }}
               >
                 <Message.CustomContent>
-                  <MessageBubble sender={msg.sender} text={msg.text} />
+                  <MessageBubble id={msg.id} sender={msg.sender} text={msg.text} />
                 </Message.CustomContent>
               </Message>
             ))}

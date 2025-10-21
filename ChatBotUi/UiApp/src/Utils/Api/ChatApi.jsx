@@ -1,18 +1,16 @@
 // src/Utils/ChatApi.jsx
 import axios from "axios";
 
-// 🌐 Base configuration
 const api = axios.create({
   baseURL: "http://localhost:8080/api/chat",
-  timeout: 10000, // ⏳ Prevent hanging requests
-  headers: {
-    "Content-Type": "application/json",
-  },
+  timeout: 10000,
+  headers: { "Content-Type": "application/json" },
 });
 
-// 🎯 Centralized API handler for all chat-related backend operations
 export const chatApi = {
-  // 🆕 Create a new chat session
+  cancelSource: null, // 🔄 store cancel token source
+
+  // 🆕 Create session
   async createSession() {
     try {
       const res = await api.post("/new");
@@ -23,18 +21,32 @@ export const chatApi = {
     }
   },
 
-  // 💬 Send message to backend for a specific session
+  // 💬 Send message with cancel support
   async sendMessage(sessionId, messages) {
     try {
-      const res = await api.post(`/${sessionId}`, { messages });
+      this.cancelSource = axios.CancelToken.source();
+      const res = await api.post(`/${sessionId}`, { messages }, { cancelToken: this.cancelSource.token });
       return res.data.reply;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.warn("⚠️ Request cancelled by user.");
+        return null;
+      }
       console.error("❌ Failed to send message:", error);
       throw error;
+    } finally {
+      this.cancelSource = null;
     }
   },
 
-  // 📜 Fetch the complete chat history for a session
+  // ✋ Cancel AI request
+  cancelMessage() {
+    if (this.cancelSource) {
+      this.cancelSource.cancel("User deleted the message during AI response.");
+      this.cancelSource = null;
+    }
+  },
+
   async getSession(sessionId) {
     try {
       const res = await api.get(`/${sessionId}`);
@@ -45,7 +57,6 @@ export const chatApi = {
     }
   },
 
-  // 🗑️ Delete a chat session (for "New Chat" or clear-all)
   async deleteSession(sessionId) {
     try {
       await api.delete(`/${sessionId}`);

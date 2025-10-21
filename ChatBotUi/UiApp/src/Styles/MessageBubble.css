@@ -75,6 +75,15 @@
 /* Icon setup */
 .icon-wrapper {
   position: relative;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* ✨ Show icons only on hover */
+.message-row:hover .icon-wrapper {
+  opacity: 1;
 }
 
 .icon-btn {
@@ -87,10 +96,12 @@
   justify-content: center;
   transition: color 0.2s ease;
   padding: 3px;
+  border-radius: 4px;
 }
 
 .icon-btn:hover {
   color: #0078ff;
+  background: rgba(0, 120, 255, 0.08);
 }
 
 /* Tooltip */
@@ -112,6 +123,16 @@
 
 .icon-btn:hover .tooltip {
   opacity: 1;
+}
+
+/* 🗑️ Delete icon styling (added) */
+.delete-btn {
+  color: #d9534f;
+}
+
+.delete-btn:hover {
+  color: #fff;
+  background: rgba(217, 83, 79, 0.9);
 }
 
 /* =============================
