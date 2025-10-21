@@ -16,41 +16,49 @@ export const ChatProvider = ({ children }) => {
     }
   }, []);
 
-  // ✉️ Send message to backend and update messages
+  // ✉️ Send message + entire history to backend
   const handleSend = useCallback(async (userMessage) => {
     if (!userMessage.trim()) return;
 
-    setMessages((prev) => {
-      const updated = [...prev, { sender: "user", text: userMessage }];
-      saveMessages(updated);
-      return updated;
-    });
+    // Add user message to local state immediately
+    const newMessages = [
+      ...messages,
+      { sender: "user", text: userMessage },
+    ];
+    setMessages(newMessages);
+    saveMessages(newMessages);
 
     try {
       setIsTyping(true);
+
+      // 🧩 Convert messages to API format for Hugging Face
+      const formattedMessages = newMessages.map((msg) => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text,
+      }));
+
+      // 🚀 Send the entire message history
       const response = await axios.post("http://localhost:8080/api/chat", {
-        message: userMessage,
+        messages: formattedMessages,
       });
+
       const aiReply = response?.data?.reply || "No response from AI.";
-      setMessages((prev) => {
-        const updated = [...prev, { sender: "ai", text: aiReply }];
-        saveMessages(updated);
-        return updated;
-      });
+
+      const updated = [...newMessages, { sender: "ai", text: aiReply }];
+      setMessages(updated);
+      saveMessages(updated);
     } catch (err) {
       console.error("Backend error:", err);
-      setMessages((prev) => {
-        const updated = [
-          ...prev,
-          { sender: "ai", text: "⚠️ Could not reach AI service. Please try again." },
-        ];
-        saveMessages(updated);
-        return updated;
-      });
+      const fallback = [
+        ...messages,
+        { sender: "ai", text: "⚠️ Could not reach AI service. Please try again." },
+      ];
+      setMessages(fallback);
+      saveMessages(fallback);
     } finally {
       setIsTyping(false);
     }
-  }, []);
+  }, [messages]);
 
   // 🆕 Clear chat + storage
   const handleNewChat = () => {
@@ -66,4 +74,4 @@ export const ChatProvider = ({ children }) => {
 };
 
 // ✅ Hook for easy usage in components
-export const useChat = () => useContext(ChatContext); 
+export const useChat = () => useContext(ChatContext);

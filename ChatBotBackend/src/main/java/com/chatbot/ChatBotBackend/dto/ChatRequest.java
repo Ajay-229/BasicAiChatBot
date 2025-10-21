@@ -1,14 +1,16 @@
 package com.chatbot.ChatBotBackend.dto;
 
-import lombok.Data;
+import java.util.List;
+import java.util.Map;
 
-@Data
 public class ChatRequest {
-    private String message;
+    private List<Map<String, String>> messages; // [{role: "user", content: "..."}]
 
-    public ChatRequest() {}
+    public List<Map<String, String>> getMessages() {
+        return messages;
+    }
 
-    public ChatRequest(String message) {
-        this.message = message;
+    public void setMessages(List<Map<String, String>> messages) {
+        this.messages = messages;
     }
 }
