@@ -194,3 +194,136 @@
     font-size: 0.65rem;
   }
 }
+
+/* ✏️ Edit icon styling (similar consistency as delete & copy) */
+.edit-btn {
+  color: #f0ad4e; /* warm yellow tone */
+}
+
+.edit-btn:hover {
+  color: #fff;
+  background: rgba(240, 173, 78, 0.9);
+}
+
+/* =============================
+   Edit Mode Text Area Styling
+============================= */
+
+/* Container wrapping editable text area + buttons */
+.edit-mode-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 70%;
+  margin-top: 0.3rem;
+}
+
+/* Text area when editing a message */
+.edit-textarea {
+  width: 100%;
+  min-height: 60px;
+  max-height: 40vh; /* grow up to 40% of viewport height */
+  resize: none;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  overflow-y: auto;
+  transition: all 0.2s ease;
+}
+
+.edit-textarea:focus {
+  border-color: #0078ff;
+  box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+}
+
+/* Buttons below the edit box */
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.edit-actions button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+/* Save (Send) and Cancel buttons */
+.save-edit-btn {
+  background: #0078ff;
+  color: #fff;
+}
+
+.save-edit-btn:hover {
+  background: #0066d4;
+}
+
+.cancel-edit-btn {
+  background: #f4f5f7;
+  color: #333;
+}
+
+.cancel-edit-btn:hover {
+  background: #e1e3e6;
+}
+
+/* =============================
+   Thread Link (<1,3> style)
+============================= */
+
+.thread-link {
+  font-size: 0.8rem;
+  color: #0078ff;
+  cursor: pointer;
+  margin-left: 6px;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.thread-link:hover {
+  color: #005bb5;
+}
+
+/* =============================
+   Responsiveness for edit area
+============================= */
+
+@media (max-width: 768px) {
+  .edit-textarea {
+    font-size: 0.9rem;
+    max-height: 35vh;
+  }
+
+  .edit-actions button {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-textarea {
+    font-size: 0.85rem;
+    max-height: 30vh;
+  }
+
+  .edit-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .edit-actions button {
+    width: 100%;
+  }
+}
