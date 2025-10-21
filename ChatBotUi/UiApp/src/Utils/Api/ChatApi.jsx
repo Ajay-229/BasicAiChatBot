@@ -3,14 +3,13 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api/chat",
-  timeout: 10000,
   headers: { "Content-Type": "application/json" },
 });
 
 export const chatApi = {
-  cancelSource: null, // 🔄 store cancel token source
+  cancelController: null, // use AbortController instead of CancelToken
 
-  // 🆕 Create session
+  // 🆕 Create new session
   async createSession() {
     try {
       const res = await api.post("/new");
@@ -21,29 +20,42 @@ export const chatApi = {
     }
   },
 
-  // 💬 Send message with cancel support
+  // 💬 Send message (supports cancel + manual timeout)
   async sendMessage(sessionId, messages) {
     try {
-      this.cancelSource = axios.CancelToken.source();
-      const res = await api.post(`/${sessionId}`, { messages }, { cancelToken: this.cancelSource.token });
+      // create abort controller
+      this.cancelController = new AbortController();
+      const { signal } = this.cancelController;
+
+      // ⏱ manual timeout: 2 minutes
+      const timeout = setTimeout(() => {
+        this.cancelController.abort("AI response took too long (2 min).");
+      }, 120000);
+
+      // make request
+      const res = await api.post(`/${sessionId}`, { messages }, { signal });
+
+      // clear timeout on success
+      clearTimeout(timeout);
+
       return res.data.reply;
     } catch (error) {
-      if (axios.isCancel(error)) {
-        console.warn("⚠️ Request cancelled by user.");
+      if (axios.isCancel(error) || error.name === "CanceledError") {
+        console.warn("⚠️ Request cancelled or timed out:", error.message);
         return null;
       }
       console.error("❌ Failed to send message:", error);
       throw error;
     } finally {
-      this.cancelSource = null;
+      this.cancelController = null;
     }
   },
 
-  // ✋ Cancel AI request
+  // ✋ Cancel AI request manually
   cancelMessage() {
-    if (this.cancelSource) {
-      this.cancelSource.cancel("User deleted the message during AI response.");
-      this.cancelSource = null;
+    if (this.cancelController) {
+      this.cancelController.abort("User deleted message during AI response.");
+      this.cancelController = null;
     }
   },
 
