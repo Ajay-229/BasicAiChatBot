@@ -27,7 +27,10 @@ const Home = () => {
 
   const handleLogin = () => navigate("/login");
   const handleSignup = () => navigate("/signup");
-  const handleProfile = () => navigate("/profile");
+  const handleProfile = () => {
+    navigate("/profile", { state: { from: "/" } });
+  };
+
 
   const handleLogoutClick = () => {
     handleLogout(logout, () => navigate("/"));

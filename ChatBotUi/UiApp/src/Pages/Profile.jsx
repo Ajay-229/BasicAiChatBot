@@ -1,17 +1,22 @@
-// src/Pages/Profile.jsx
 import React from "react";
 import { useUser } from "../Context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Profile = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!user) {
-    // If no user, redirect to login
     navigate("/login");
     return null;
   }
+
+  const goBack = () => {
+    // Use state.from if exists, else default to "/"
+    const origin = location.state?.from || "/";
+    navigate(origin);
+  };
 
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -20,7 +25,7 @@ const Profile = () => {
       <p>Email: {user.email}</p>
       <p>First Name: {user.firstName}</p>
       <p>Last Name: {user.lastName || "-"}</p>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <button onClick={goBack}>Back</button>
     </div>
   );
 };

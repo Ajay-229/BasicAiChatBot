@@ -1,11 +1,28 @@
 // src/Components/ChatUI/ChatHeader.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Settings } from "@carbon/icons-react";
+import { ArrowLeft } from "@carbon/icons-react";
+import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { useUser } from "../Context/UserContext";
+import { handleLogout } from "../Utils/LogoutHandler";
 import "../styles/ChatHeader.css";
 
 const ChatHeader = () => {
   const navigate = useNavigate();
+  const { user, logout } = useUser();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+
+  const onLogout = () => {
+    handleLogout(logout, () => navigate("/"));
+    setMenuOpen(false);
+  };
+
+  const goProfile = () => {
+    navigate("/profile", { state: { from: "/chat" } });
+    setMenuOpen(false);
+  };
 
   return (
     <header className="chat-header">
@@ -19,10 +36,31 @@ const ChatHeader = () => {
         {/* Title */}
         <h1 className="chat-title">AI Chat Assistant</h1>
 
-        {/* Settings Button */}
-        <button className="settings-btn">
-          <Settings size={20} />
-        </button>
+        {/* Profile Icon */}
+        {user && (
+          <div className="user-menu-container">
+            <button className="user-menu-btn" onClick={toggleMenu}>
+              <FaUser size={20} />
+            </button>
+
+            {/* Modal-style menu */}
+            {menuOpen && (
+              <div className="user-menu-modal-overlay" onClick={() => setMenuOpen(false)}>
+                <div
+                  className="user-menu-modal"
+                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+                >
+                  <button onClick={goProfile}>
+                    <FaUser style={{ marginRight: "8px" }} /> Profile
+                  </button>
+                  <button onClick={onLogout}>
+                    <FaSignOutAlt style={{ marginRight: "8px" }} /> Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
