@@ -2,7 +2,6 @@
    Global Chat Page Layout
 ============================= */
 
-/* 🧱 Outer wrapper (centers everything, gives background + border) */
 .chat-wrapper {
   display: flex;
   justify-content: center;
@@ -17,10 +16,9 @@
   border-right: 1px solid #e0e0e0;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
-  overflow: hidden; /* prevent full-page scroll */
+  overflow: hidden;
 }
 
-/* 🧩 Inner main layout — sidebar + chat area */
 .chat-layout {
   display: flex;
   flex: 1;
@@ -32,7 +30,6 @@
   overflow: hidden;
 }
 
-/* 🗨️ Chat area container (holds header, messages, footer) */
 .chat-page {
   flex: 1;
   display: flex;
@@ -44,22 +41,18 @@
 /* =============================
    Responsive Adjustments
 ============================= */
-
-/* Large Desktop (≥1600px) */
 @media (min-width: 1600px) {
   .chat-wrapper {
     max-width: 1400px;
   }
 }
 
-/* Laptop (≤1280px) */
 @media (max-width: 1280px) {
   .chat-wrapper {
     width: 90%;
   }
 }
 
-/* Tablet / Small Laptop (≤1024px) */
 @media (max-width: 1024px) {
   .chat-wrapper {
     width: 100%;
@@ -76,24 +69,27 @@
   }
 }
 
-/* Mobile (≤768px) */
+/* ✅ Mobile */
 @media (max-width: 768px) {
   .chat-wrapper {
     width: 100%;
     height: 100dvh;
-    padding: 0.5rem;
-    overflow: visible;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
   }
 
   .chat-layout {
-    flex-direction: column;
-    height: 100%;
+    display: flex;
+    flex-direction: row;
     width: 100%;
-    border-radius: 0;
-    overflow: visible;
+    height: 100%;
+    overflow: hidden;
   }
 
   .chat-page {
+    flex: 1;
     overflow: hidden;
   }
 
@@ -108,7 +104,7 @@
   }
 }
 
-/* Small Mobile (≤480px) */
+/* Small Mobile */
 @media (max-width: 480px) {
   .chat-wrapper {
     padding: 0.25rem;

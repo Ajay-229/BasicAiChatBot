@@ -1,22 +1,22 @@
 /* =============================
-   Sidebar Base Layout
+   Sidebar Layout (Full Height)
 ============================= */
-
 .sidebar {
   background-color: #ffffff;
   border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 0.5rem;
+  padding: 0.8rem 0.5rem;
   box-sizing: border-box;
   transition: width 0.3s ease, transform 0.3s ease;
   overflow: hidden;
-  height: calc(100dvh - 60px); /* 👈 below header (approx 60px high) */
-  margin-top: 60px; /* ensures it starts below header */
+  height: 100dvh;
+  position: relative;
+  z-index: 1000;
 }
 
-/* Collapsed / Expanded widths (desktop) */
+/* Collapsed / Expanded */
 .sidebar.collapsed {
   width: 70px;
 }
@@ -26,49 +26,32 @@
   padding: 1rem;
 }
 
-/* Toggle Button - default */
+/* =============================
+   Buttons
+============================= */
 .toggle-btn {
-  background: none;
-  border: none;
+  background: #f4f4f4;
+  border: 1px solid #ddd;
   color: #333;
   cursor: pointer;
-  margin-bottom: 1rem;
-  transition: transform 0.3s ease;
-  font-size: 1.2rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.toggle-btn:hover {
-  transform: scale(1.05);
-}
-
-/* Desktop inline toggle */
-.toggle-btn.desktop-toggle {
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: transparent;
+  z-index: 5;
 }
 
-/* Mobile fixed toggle (below header) */
-.toggle-btn.mobile-toggle {
-  position: fixed;
-  top: 70px; /* 👈 just below header */
-  left: 1rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #0078ff;
-  color: #fff;
-  z-index: 2100;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.toggle-btn:hover {
+  background-color: #e9e9e9;
+  transform: scale(1.1);
 }
 
-/* New Chat Button */
 .new-chat-btn {
   background-color: #0078ff;
   color: white;
@@ -83,27 +66,9 @@
   width: 100%;
   justify-content: center;
 }
+
 .new-chat-btn:hover {
   background-color: #005fcc;
-}
-
-/* Icon-only (collapsed) */
-.icon-only {
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border-radius: 50%;
-}
-
-/* Expanded with text (desktop) */
-.expanded-btn {
-  justify-content: flex-start;
-}
-
-.btn-text {
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 
 /* Sidebar Body */
@@ -133,8 +98,6 @@
 /* =============================
    Responsive Adjustments
 ============================= */
-
-/* Laptop (≤1280px) */
 @media (max-width: 1280px) {
   .sidebar.expanded {
     width: 200px;
@@ -144,78 +107,213 @@
   }
 }
 
-/* Tablet / Small Laptop (≤1024px) */
 @media (max-width: 1024px) {
   .sidebar.expanded {
     width: 180px;
   }
-  .sidebar.collapsed {
+}
+
+/* ✅ Mobile Responsive */
+@media (max-width: 768px) {
+  /* Collapsed — stays inside layout */
+  .sidebar {
+    position: relative;
+    width: 60px;
+    height: 100%;
+    flex-shrink: 0;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    box-shadow: none;
+    z-index: 1000;
+  }
+
+  /* Expanded — overlays the chat */
+  .sidebar.show {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100dvh;
+    background: #ffffff;
+    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.15);
+    z-index: 2100;
+  }
+
+  /* Toggle Button (fixed, top-left) */
+  .toggle-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background-color: #0078ff;
+    color: white;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    z-index: 2200;
+    transition: all 0.3s ease;
+  }
+
+  .toggle-btn:hover {
+    transform: scale(1.1);
+    background-color: #005fcc;
+  }
+
+  .new-chat-btn {
+    margin-top: 4rem;
+  }
+}
+
+/* ✅ Small Mobile */
+@media (max-width: 480px) {
+  .sidebar {
     width: 55px;
   }
+
+  .sidebar.show {
+    width: 180px;
+  }
+
+  .toggle-btn {
+    width: 36px;
+    height: 36px;
+    top: 0.8rem;
+    left: 0.8rem;
+  }
+
   .new-chat-btn {
-    padding: 0.5rem 0.8rem;
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.6rem;
+  }
+}
+
+/* ✅ Overlay Background (dim on expand) */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 2050;
+  display: none;
+  transition: opacity 0.3s ease;
+}
+.sidebar.show + .sidebar-overlay {
+  display: block;
+  opacity: 1;
+}
+
+/* =============================
+   Global Chat Page Layout
+============================= */
+
+.chat-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  margin: 0 auto;
+  height: 100vh;
+  background: #f4f5f7;
+  padding: 0;
+  box-sizing: border-box;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chat-layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  background: #fafafa;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chat-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* =============================
+   Responsive Adjustments
+============================= */
+@media (min-width: 1600px) {
+  .chat-wrapper {
+    max-width: 1400px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .chat-wrapper {
+    width: 90%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .chat-wrapper {
+    width: 100%;
+    max-width: 95%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .chat-layout {
+    width: 95%;
+    height: 95vh;
+  }
+}
+
+/* ✅ Mobile */
+@media (max-width: 768px) {
+  .chat-wrapper {
+    width: 100%;
+    height: 100dvh;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .chat-layout {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .chat-page {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+
+  .message-input {
     font-size: 0.9rem;
   }
 }
 
-/* 📱 Mobile (≤768px) */
-@media (max-width: 768px) {
-  .sidebar.mobile {
-    position: fixed;
-    top: 60px; /* 👈 starts below header */
-    left: 0;
-    width: 220px;
-    height: calc(100dvh - 60px);
-    z-index: 2000;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    transform: translateX(-100%);
-    transition: transform 0.28s ease;
-    overflow-y: auto;
-  }
-
-  .sidebar.mobile.show {
-    transform: translateX(0);
-  }
-
-  .toggle-btn.mobile-toggle {
-    top: 68px; /* 👈 slightly below header visually */
-    left: 0.75rem;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background-color: #0078ff;
-    color: #fff;
-    z-index: 2100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .new-chat-btn {
-    font-size: 0.85rem;
-    padding: 0.55rem 0.75rem;
-    gap: 8px;
-    margin-top: 1rem;
-    width: calc(100% - 1rem);
-    margin-left: 0.5rem;
-  }
-}
-
-/* Small Mobile (≤480px) */
+/* Small Mobile */
 @media (max-width: 480px) {
-  .sidebar.mobile {
-    width: 180px;
+  .chat-wrapper {
+    padding: 0.25rem;
   }
-  .toggle-btn.mobile-toggle {
-    top: 66px;
-    left: 0.6rem;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-  }
-  .new-chat-btn {
-    font-size: 0.8rem;
-    padding: 0.45rem 0.6rem;
+
+  .chat-header h1,
+  .chat-header h2 {
+    font-size: 1rem;
   }
 }
