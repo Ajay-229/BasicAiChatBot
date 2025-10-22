@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../Utils/Api/AuthApi";
+import { useUser } from "../Context/UserContext";
 import { ArrowLeft, View, ViewOff } from "@carbon/icons-react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useUser(); // ✅ Use context login
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,12 +23,11 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await AuthApi.login({ emailOrUsername, password });
+      login(res); // ✅ update context and localStorage
       showAlert("✅ Login successful! Redirecting...");
-      console.log("User data:", res);
-      setTimeout(() => navigate("/chat"), 2000);
+      setTimeout(() => navigate("/chat"), 500);
     } catch (err) {
-      // Extract meaningful message
-      const msg = err?.message || (typeof err === "string" ? err : "❌ Invalid credentials");
+      const msg = err?.message || "❌ Invalid credentials";
       showAlert(msg);
     } finally {
       setLoading(false);
@@ -81,11 +82,7 @@ const Login = () => {
         </a>
       </p>
 
-      {alertMsg && (
-        <div className="alert-popup">
-          {alertMsg}
-        </div>
-      )}
+      {alertMsg && <div className="alert-popup">{alertMsg}</div>}
     </div>
   );
 };

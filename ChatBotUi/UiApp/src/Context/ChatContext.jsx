@@ -1,6 +1,6 @@
 // src/Context/ChatContext.js
 import React, { createContext, useState, useEffect, useCallback, useContext, useRef } from "react";
-import { saveMessages, loadMessages, clearMessages } from "../Utils/ChatStorage";
+import { saveMessages, loadMessages, clearMessages } from "../Utils/Session/ChatStorage";
 import { chatApi } from "../Utils/Api/ChatApi";
 import { v4 as uuidv4 } from "uuid";
 

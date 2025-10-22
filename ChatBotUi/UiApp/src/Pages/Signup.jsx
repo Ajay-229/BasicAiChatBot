@@ -1,10 +1,14 @@
+// src/Pages/Signup.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../Utils/Api/AuthApi";
+import { useUser } from "../Context/UserContext";
 import { ArrowLeft, View, ViewOff } from "@carbon/icons-react";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { login } = useUser(); // ✅ get login from context
+
   const [form, setForm] = useState({
     username: "",
     firstName: "",
@@ -13,6 +17,7 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [alertMsg, setAlertMsg] = useState(null);
@@ -22,25 +27,17 @@ const Signup = () => {
     setTimeout(() => setAlertMsg(null), duration);
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  // ✅ Check if username or email already exists (auto-validation with reason)
   const handleBlur = async (e) => {
     const { name, value } = e.target;
     if ((name === "username" || name === "email") && value.trim() !== "") {
       try {
         const response = await AuthApi.checkUnique(name, value);
-
-        if (response.exists) {
-          // Use server message if available
-          showAlert(response.message || `❌ ${name === "username" ? "Username" : "Email"} already taken!`);
-        } else if (response.error) {
-          showAlert(`⚠️ ${response.error}`);
-        }
+        if (response.exists) showAlert(response.message || `❌ ${name} already taken!`);
+        else if (response.error) showAlert(`⚠️ ${response.error}`);
       } catch (err) {
-        console.error("Uniqueness check failed:", err);
+        console.error(err);
         showAlert("⚠️ Couldn't verify uniqueness. Please try again.");
       }
     }
@@ -48,7 +45,6 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (form.password !== form.confirmPassword) {
       showAlert("❌ Passwords do not match!");
       return;
@@ -56,12 +52,21 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await AuthApi.signup(form);
-      showAlert("✅ Signup successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
+      const res = await AuthApi.signup(form);
+
+      // ✅ Save user in context
+      login({
+        id: res.id || null,
+        username: form.username,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+      });
+
+      showAlert("✅ Signup successful! Redirecting to chat...");
+      setTimeout(() => navigate("/chat"), 500);
     } catch (err) {
-      // Extract meaningful message from thrown Error
-      const msg = err?.message || (typeof err === "string" ? err : "❌ Signup failed");
+      const msg = err?.message || "❌ Signup failed";
       showAlert(msg);
     } finally {
       setLoading(false);
@@ -112,7 +117,6 @@ const Signup = () => {
           onBlur={handleBlur}
           required
         />
-
         <div className="password-field">
           <input
             type={showPassword ? "text" : "password"}
@@ -130,7 +134,6 @@ const Signup = () => {
             {showPassword ? <ViewOff size={20} /> : <View size={20} />}
           </button>
         </div>
-
         <input
           type={showPassword ? "text" : "password"}
           name="confirmPassword"
