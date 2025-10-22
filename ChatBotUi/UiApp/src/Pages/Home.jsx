@@ -8,7 +8,7 @@ import img4 from "../Assets/HomeImages/img4.jpg";
 import img5 from "../Assets/HomeImages/img5.jpg";
 import StayLoggedOutPopup from "../Components/StayLoggedOutPopup";
 import { useUser } from "../Context/UserContext";
-import { clearMessages } from "../Utils/Session/ChatStorage";
+import { handleLogout } from "../Utils/LogoutHandler";
 import "../styles/Home.css";
 
 const Home = () => {
@@ -21,27 +21,20 @@ const Home = () => {
   const bgImageUrl = images[randomIndex];
 
   const handleStartChat = () => {
-    if (user) {
-      navigate("/chat"); // Logged in users go directly
-    } else {
-      setShowPopup(true); // Show popup for non-logged-in users
-    }
+    if (user) navigate("/chat");
+    else setShowPopup(true);
   };
 
   const handleLogin = () => navigate("/login");
   const handleSignup = () => navigate("/signup");
-  const handleProfile = () => navigate("/profile"); // dummy profile
-  const handleLogout = () => {
-    logout(); // clear user context and localStorage
-    clearMessages(); // clear chat messages
-    navigate("/"); // back to home
+  const handleProfile = () => navigate("/profile");
+
+  const handleLogoutClick = () => {
+    handleLogout(logout, () => navigate("/"));
   };
 
   return (
-    <div
-      className="home"
-      style={{ backgroundImage: `url(${bgImageUrl})` }}
-    >
+    <div className="home" style={{ backgroundImage: `url(${bgImageUrl})` }}>
       <div className="home-content">
         <h1>Welcome to AI ChatBot</h1>
         <p>A simple chatbot powered by HuggingFace and Spring Boot backend.</p>
@@ -67,7 +60,7 @@ const Home = () => {
               <button onClick={handleProfile}>
                 <FaUser style={{ marginRight: "8px" }} /> Profile
               </button>
-              <button onClick={handleLogout}>
+              <button onClick={handleLogoutClick}>
                 <FaSignOutAlt style={{ marginRight: "8px" }} /> Logout
               </button>
             </>
