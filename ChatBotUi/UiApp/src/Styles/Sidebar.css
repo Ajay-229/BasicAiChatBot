@@ -15,7 +15,7 @@
   height: 100%;
 }
 
-/* Collapsed / Expanded widths */
+/* Collapsed / Expanded widths (desktop) */
 .sidebar.collapsed {
   width: 70px;
 }
@@ -25,7 +25,7 @@
   padding: 1rem;
 }
 
-/* Toggle Button */
+/* Toggle Button - default (will be positioned differently with media queries) */
 .toggle-btn {
   background: none;
   border: none;
@@ -34,9 +34,38 @@
   margin-bottom: 1rem;
   transition: transform 0.3s ease;
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .toggle-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+}
+
+/* Desktop inline toggle (keeps similar visual location) */
+.toggle-btn.desktop-toggle {
+  position: relative; /* stays in flow relative to surrounding layout */
+  margin-bottom: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Mobile fixed toggle (always visible even when sidebar hidden) */
+.toggle-btn.mobile-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #0078ff;
+  color: #fff;
+  z-index: 2100;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* New Chat Button */
@@ -48,7 +77,7 @@
   padding: 0.6rem 1rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px; /* spacing between icon and text */
   cursor: pointer;
   transition: background 0.2s ease;
   width: 100%;
@@ -67,7 +96,7 @@
   border-radius: 50%;
 }
 
-/* Expanded with text */
+/* Expanded with text (desktop) */
 .expanded-btn {
   justify-content: flex-start;
 }
@@ -102,7 +131,7 @@
 }
 
 /* =============================
-   Responsive Adjustments
+   Responsive Adjustments (retain all breakpoints)
 ============================= */
 
 /* Laptop (≤1280px) */
@@ -130,54 +159,74 @@
   }
 }
 
-/* Mobile (≤768px) */
+/* 📱 Mobile (≤768px) - sliding overlay style */
 @media (max-width: 768px) {
-  .sidebar {
+  /* Use a class target for mobile to ensure we have fixed width */
+  .sidebar.mobile {
     position: fixed;
     top: 0;
     left: 0;
+    width: 220px;            /* visible width for slide panel */
     height: 100dvh;
-    z-index: 999;
+    z-index: 2000;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
-    transform: translateX(-100%);
+    transform: translateX(-100%); /* hidden by default */
+    transition: transform 0.28s ease;
+    overflow-y: auto;
   }
 
-  .sidebar.show {
+  /* When in mobile mode and 'show' applied, slide in */
+  .sidebar.mobile.show {
     transform: translateX(0);
   }
 
-  .toggle-btn {
-    position: absolute;
+  /* ensure the toggle (outside) is properly visible on mobile */
+  .toggle-btn.mobile-toggle {
     top: 1rem;
-    right: -2.5rem;
-    background-color: #0078ff;
-    color: #fff;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    left: 1rem;
   }
 
+  /* keep new chat button spacing sensible when mobile */
   .new-chat-btn {
     font-size: 0.85rem;
     padding: 0.5rem;
+    gap: 8px;
+    margin-top: 3.5rem; /* push below toggle for readability */
   }
 }
 
-/* Small Mobile (≤480px) */
+/* Small Mobile (≤480px) adjustments */
 @media (max-width: 480px) {
-  .sidebar.expanded {
-    width: 160px;
+  .sidebar.mobile {
+    width: 180px;
   }
 
-  .toggle-btn {
-    right: -2rem;
-    width: 36px;
-    height: 36px;
+  .toggle-btn.mobile-toggle {
+    width: 38px;
+    height: 38px;
     font-size: 1rem;
   }
 
   .new-chat-btn {
     font-size: 0.8rem;
+    padding: 0.4rem;
+    gap: 6px;
+    margin-top: 3rem;
+  }
+}
+
+/* 💻 Desktop toggle position: keep visually similar to original (inline) */
+@media (min-width: 769px) {
+  .toggle-btn.desktop-toggle {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-left: 0;
+    margin-bottom: 1rem;
+    background: transparent;
+    color: #333;
+    width: 40px;
+    height: 40px;
   }
 }
