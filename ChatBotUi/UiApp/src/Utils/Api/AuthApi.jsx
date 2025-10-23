@@ -1,69 +1,51 @@
-// src/Utils/Api/AuthApi.js
-import axios from "axios";
+import { axiosInstance } from "./AxiosConfig";
 
-const api = axios.create({
-  baseURL: "/api/auth",
-  headers: { "Content-Type": "application/json" },
-});
-
-function extractMessageFromAxiosError(error) {
-  // axios error shape: error.response?.data might be string or object
+// Helper to extract readable messages from Axios errors
+function extractMessage(error) {
   if (!error) return "Unknown error";
   const data = error.response?.data;
   if (typeof data === "string") return data;
   if (data && typeof data === "object") {
-    // common patterns: { message: "..." } or { error: "..."}
     return data.message || data.error || JSON.stringify(data);
   }
-  // fallback to error.message or generic
   return error.message || "Request failed";
 }
 
 export const AuthApi = {
-  // Signup with first & last name
   async signup({ username, firstName, lastName, email, password }) {
     try {
-      const res = await api.post("/signup", {
-        username,
-        firstName,
-        lastName,
-        email,
-        password,
+      const res = await axiosInstance.post("/auth/signup", {
+        username, firstName, lastName, email, password
       });
       return res.data;
     } catch (error) {
-      console.error("❌ Signup failed:", error);
-      // normalize into an Error instance so frontend can read .message
-      const msg = extractMessageFromAxiosError(error);
+      const msg = extractMessage(error);
+      console.error("❌ Signup failed:", msg);
       throw new Error(msg);
     }
   },
 
-  // Login via username OR email
   async login({ emailOrUsername, password }) {
     try {
-      const res = await api.post("/login", {
-        email: emailOrUsername,
-        password,
+      const res = await axiosInstance.post("/auth/login", {
+        email: emailOrUsername, password
       });
       return res.data;
     } catch (error) {
-      console.error("❌ Login failed:", error);
-      const msg = extractMessageFromAxiosError(error);
+      const msg = extractMessage(error);
+      console.error("❌ Login failed:", msg);
       throw new Error(msg);
     }
   },
 
-  // ✅ Check if email or username already exists
   async checkUnique(field, value) {
     try {
-      const res = await api.get(`/check-unique?field=${field}&value=${value}`);
-      return res.data; // { exists: true/false, message: "..." } expected
+      const res = await axiosInstance.get("/auth/check-unique", { params: { field, value } });
+      return res.data; // { exists: true/false, message: "..." }
     } catch (error) {
-      console.error("❌ Uniqueness check failed:", error);
-      const msg = extractMessageFromAxiosError(error);
-      // return a consistent object so frontend can show a reason
+      const msg = extractMessage(error);
+      console.error("❌ Uniqueness check failed:", msg);
       return { exists: false, error: msg };
     }
-  },
+  }
 };

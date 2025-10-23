@@ -1,80 +1,80 @@
-// src/Utils/ChatApi.jsx
-import axios from "axios";
+import { axiosInstance } from "./AxiosConfig";
 
-const api = axios.create({
-  baseURL: "http://localhost:8080/api/chat",
-  headers: { "Content-Type": "application/json" },
-});
+// Helper to extract readable messages from Axios errors
+function extractMessage(error) {
+  if (!error) return "Unknown error";
+  const data = error.response?.data;
+  if (typeof data === "string") return data;
+  if (data && typeof data === "object") {
+    return data.message || data.error || JSON.stringify(data);
+  }
+  return error.message || "Request failed";
+}
 
-export const chatApi = {
-  cancelController: null, // use AbortController instead of CancelToken
+export const ChatApi = {
+  cancelController: null,
 
-  // 🆕 Create new session
   async createSession() {
     try {
-      const res = await api.post("/new");
-      return res.data.sessionId;
+      const res = await axiosInstance.post("/chat/new");
+      if (res?.data?.sessionId) return res.data.sessionId;
+      throw new Error("No sessionId returned from server");
     } catch (error) {
-      console.error("❌ Failed to create session:", error);
-      throw error;
+      const msg = extractMessage(error);
+      console.error("❌ Create session failed:", msg);
+      throw new Error(msg);
     }
   },
 
-  // 💬 Send message (supports cancel + manual timeout)
   async sendMessage(sessionId, messages) {
+    if (!sessionId) throw new Error("sendMessage called without sessionId");
+
+    const controller = new AbortController();
+    this.cancelController = controller;
+    const signal = controller.signal;
+    const TIMEOUT_MS = 120000;
+    let timeoutId;
+
     try {
-      // create abort controller
-      this.cancelController = new AbortController();
-      const { signal } = this.cancelController;
-
-      // ⏱ manual timeout: 2 minutes
-      const timeout = setTimeout(() => {
-        this.cancelController.abort("AI response took too long (2 min).");
-      }, 120000);
-
-      // make request
-      const res = await api.post(`/${sessionId}`, { messages }, { signal });
-
-      // clear timeout on success
-      clearTimeout(timeout);
-
-      return res.data.reply;
+      timeoutId = setTimeout(() => this.cancelController?.abort(), TIMEOUT_MS);
+      const res = await axiosInstance.post(`/chat/${sessionId}`, { messages }, { signal });
+      return res?.data?.reply ?? null;
     } catch (error) {
-      if (axios.isCancel(error) || error.name === "CanceledError") {
-        console.warn("⚠️ Request cancelled or timed out:", error.message);
-        return null;
-      }
-      console.error("❌ Failed to send message:", error);
-      throw error;
+      const msg = extractMessage(error);
+      console.error("❌ Send message failed:", msg);
+      throw new Error(msg);
     } finally {
-      this.cancelController = null;
+      clearTimeout(timeoutId);
+      if (this.cancelController === controller) this.cancelController = null;
     }
   },
 
-  // ✋ Cancel AI request manually
   cancelMessage() {
     if (this.cancelController) {
-      this.cancelController.abort("User deleted message during AI response.");
+      try { this.cancelController.abort(); }
+      catch (e) { console.warn("Abort call threw:", e); }
       this.cancelController = null;
     }
   },
 
   async getSession(sessionId) {
     try {
-      const res = await api.get(`/${sessionId}`);
+      const res = await axiosInstance.get(`/chat/${sessionId}`);
       return res.data;
     } catch (error) {
-      console.error("❌ Failed to fetch session:", error);
-      throw error;
+      const msg = extractMessage(error);
+      console.error("❌ Get session failed:", msg);
+      throw new Error(msg);
     }
   },
 
   async deleteSession(sessionId) {
     try {
-      await api.delete(`/${sessionId}`);
+      await axiosInstance.delete(`/chat/${sessionId}`);
     } catch (error) {
-      console.error("❌ Failed to delete session:", error);
-      throw error;
+      const msg = extractMessage(error);
+      console.error("❌ Delete session failed:", msg);
+      throw new Error(msg);
     }
-  },
+  }
 };
