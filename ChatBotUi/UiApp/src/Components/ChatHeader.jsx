@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "@carbon/icons-react";
 import { FaUser, FaSignOutAlt, FaLock } from "react-icons/fa";
@@ -10,8 +10,16 @@ const ChatHeader = () => {
   const navigate = useNavigate();
   const { user, logout } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuTop, setMenuTop] = useState(0);
+  const profileBtnRef = useRef(null);
 
-  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const toggleMenu = () => {
+    if (!menuOpen && profileBtnRef.current) {
+      const rect = profileBtnRef.current.getBoundingClientRect();
+      setMenuTop(rect.bottom + 4); // 4px spacing below icon
+    }
+    setMenuOpen((prev) => !prev);
+  };
 
   const onLogout = () => {
     handleLogout(logout, () => navigate("/"));
@@ -47,7 +55,11 @@ const ChatHeader = () => {
 
         {/* Profile Icon */}
         <div className="user-menu-container">
-          <button className="user-menu-btn" onClick={toggleMenu}>
+          <button
+            ref={profileBtnRef}
+            className="user-menu-btn"
+            onClick={toggleMenu}
+          >
             <FaUser size={20} />
           </button>
 
@@ -58,7 +70,8 @@ const ChatHeader = () => {
             >
               <div
                 className="user-menu-modal"
-                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+                style={{ top: `${menuTop}px` }}
+                onClick={(e) => e.stopPropagation()}
               >
                 {user ? (
                   <>
