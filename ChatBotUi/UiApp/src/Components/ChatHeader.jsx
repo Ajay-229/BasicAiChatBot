@@ -1,8 +1,7 @@
-// src/Components/ChatUI/ChatHeader.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "@carbon/icons-react";
-import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaLock } from "react-icons/fa";
 import { useUser } from "../Context/UserContext";
 import { handleLogout } from "../Utils/LogoutHandler";
 import "../styles/ChatHeader.css";
@@ -24,6 +23,16 @@ const ChatHeader = () => {
     setMenuOpen(false);
   };
 
+  const goLogin = () => {
+    navigate("/login");
+    setMenuOpen(false);
+  };
+
+  const goSignup = () => {
+    navigate("/signup");
+    setMenuOpen(false);
+  };
+
   return (
     <header className="chat-header">
       <div className="chat-header-inner">
@@ -37,30 +46,43 @@ const ChatHeader = () => {
         <h1 className="chat-title">AI Chat Assistant</h1>
 
         {/* Profile Icon */}
-        {user && (
-          <div className="user-menu-container">
-            <button className="user-menu-btn" onClick={toggleMenu}>
-              <FaUser size={20} />
-            </button>
+        <div className="user-menu-container">
+          <button className="user-menu-btn" onClick={toggleMenu}>
+            <FaUser size={20} />
+          </button>
 
-            {/* Modal-style menu */}
-            {menuOpen && (
-              <div className="user-menu-modal-overlay" onClick={() => setMenuOpen(false)}>
-                <div
-                  className="user-menu-modal"
-                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-                >
-                  <button onClick={goProfile}>
-                    <FaUser style={{ marginRight: "8px" }} /> Profile
-                  </button>
-                  <button onClick={onLogout}>
-                    <FaSignOutAlt style={{ marginRight: "8px" }} /> Logout
-                  </button>
-                </div>
+          {menuOpen && (
+            <div
+              className="user-menu-modal-overlay"
+              onClick={() => setMenuOpen(false)}
+            >
+              <div
+                className="user-menu-modal"
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+              >
+                {user ? (
+                  <>
+                    <button onClick={goProfile}>
+                      <FaUser style={{ marginRight: "8px" }} /> Profile
+                    </button>
+                    <button onClick={onLogout}>
+                      <FaSignOutAlt style={{ marginRight: "8px" }} /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={goLogin}>
+                      <FaLock style={{ marginRight: "8px" }} /> Login
+                    </button>
+                    <button onClick={goSignup}>
+                      <FaLock style={{ marginRight: "8px" }} /> Signup
+                    </button>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
