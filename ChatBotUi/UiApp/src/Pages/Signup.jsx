@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../Utils/Api/AuthApi";
 import { useUser } from "../Context/UserContext";
 import { ArrowLeft, View, ViewOff } from "@carbon/icons-react";
+import "../styles/Auth.css";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { login } = useUser(); // ✅ get login from context
+  const { login } = useUser();
 
   const [form, setForm] = useState({
     username: "",
@@ -27,7 +28,8 @@ const Signup = () => {
     setTimeout(() => setAlertMsg(null), duration);
   };
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleBlur = async (e) => {
     const { name, value } = e.target;
@@ -53,8 +55,6 @@ const Signup = () => {
     setLoading(true);
     try {
       const res = await AuthApi.signup(form);
-
-      // ✅ Save user in context
       login({
         id: res.id || null,
         username: form.username,
@@ -62,7 +62,6 @@ const Signup = () => {
         lastName: form.lastName,
         email: form.email,
       });
-
       showAlert("✅ Signup successful! Redirecting to chat...");
       setTimeout(() => navigate("/chat"), 500);
     } catch (err) {
@@ -83,6 +82,7 @@ const Signup = () => {
       </div>
 
       <h2>Signup</h2>
+
       <form onSubmit={handleSubmit} className="auth-form">
         <input
           type="text"
@@ -143,12 +143,12 @@ const Signup = () => {
           required
         />
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? "Signing up..." : "Signup"}
         </button>
       </form>
 
-      <p>
+      <p className="auth-footer">
         Already have an account?{" "}
         <a href="/login" className="auth-link">
           Login here

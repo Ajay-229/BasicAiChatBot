@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../Utils/Api/AuthApi";
 import { useUser } from "../Context/UserContext";
 import { ArrowLeft, View, ViewOff } from "@carbon/icons-react";
+import "../styles/Auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useUser(); // ✅ Use context login
+  const { login } = useUser();
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,7 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await AuthApi.login({ emailOrUsername, password });
-      login(res); // ✅ update context and localStorage
+      login(res);
       showAlert("✅ Login successful! Redirecting...");
       setTimeout(() => navigate("/chat"), 500);
     } catch (err) {
@@ -44,6 +45,7 @@ const Login = () => {
       </div>
 
       <h2>Login</h2>
+
       <form onSubmit={handleSubmit} className="auth-form">
         <input
           type="text"
@@ -63,19 +65,19 @@ const Login = () => {
           />
           <button
             type="button"
-            onClick={() => setShowPassword(!showPassword)}
             className="eye-btn"
+            onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <ViewOff size={20} /> : <View size={20} />}
           </button>
         </div>
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 
-      <p>
+      <p className="auth-footer">
         Don’t have an account?{" "}
         <a href="/signup" className="auth-link">
           Sign up here

@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 50px 20px;
+  font-family: 'Montserrat', sans-serif;
+  background: #f4f6f8; /* light neutral background */
+  color: #333;
+  position: relative;
+}
+
+.auth-header {
+  align-self: flex-start;
+  margin-bottom: 30px;
+}
+
+.back-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.back-icon-btn:hover {
+  color: #007bff;
+}
+
+.auth-page h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-form input {
+  padding: 12px 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  background-color: #fff;
+  color: #333;
+}
+
+.auth-form input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+.password-field {
+  position: relative;
+}
+
+.eye-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+}
+
+.submit-btn {
+  padding: 12px 30px;
+  border-radius: 25px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 12px rgba(0,86,179,0.3);
+}
+
+.auth-footer {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.auth-link {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.alert-popup {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff5252;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 1000;
+  font-size: 14px;
+}
+
+@media (max-width: 500px) {
+  .auth-page {
+    padding: 40px 15px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .auth-page h2 {
+    font-size: 1.5rem;
+  }
+}
