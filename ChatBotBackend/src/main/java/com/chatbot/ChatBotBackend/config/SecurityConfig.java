@@ -11,9 +11,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // Disable CSRF for Postman testing
+                .csrf().disable() // Disable CSRF for dev/testing
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll() // Allow signup & login
+                .requestMatchers("/api/chat/**").permitAll() // Allow chat endpoints
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().disable()
