@@ -1,6 +1,5 @@
 import { axiosInstance } from "./AxiosConfig";
 
-// Helper to extract readable messages from Axios errors
 function extractMessage(error) {
   if (!error) return "Unknown error";
   const data = error.response?.data;
@@ -51,8 +50,11 @@ export const ChatApi = {
 
   cancelMessage() {
     if (this.cancelController) {
-      try { this.cancelController.abort(); }
-      catch (e) { console.warn("Abort call threw:", e); }
+      try {
+        this.cancelController.abort();
+      } catch (e) {
+        console.warn("Abort call threw:", e);
+      }
       this.cancelController = null;
     }
   },

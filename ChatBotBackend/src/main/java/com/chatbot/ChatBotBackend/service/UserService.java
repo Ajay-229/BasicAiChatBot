@@ -1,5 +1,6 @@
 package com.chatbot.ChatBotBackend.service;
 
+import com.chatbot.ChatBotBackend.config.JwtUtil;
 import com.chatbot.ChatBotBackend.dto.*;
 import com.chatbot.ChatBotBackend.model.User;
 import com.chatbot.ChatBotBackend.repository.UserRepository;
@@ -15,11 +16,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    // ===========================
-    // ✅ Signup Logic
-    // ===========================
-    public UserResponse registerUser(SignupRequest request) {
+    public AuthResponse registerUser(SignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
@@ -37,13 +36,20 @@ public class UserService {
                 .build();
 
         User saved = userRepository.save(user);
-        return new UserResponse(saved.getId(), saved.getUsername(), saved.getFirstName(), saved.getLastName(), saved.getEmail());
+
+        String token = jwtUtil.generateToken(saved.getUsername());
+
+        return new AuthResponse(
+                saved.getId(),
+                saved.getUsername(),
+                saved.getFirstName(),
+                saved.getLastName(),
+                saved.getEmail(),
+                token
+        );
     }
 
-    // ===========================
-    // ✅ Login via email OR username
-    // ===========================
-    public UserResponse loginUser(LoginRequest request) {
+    public AuthResponse loginUser(LoginRequest request) {
         String identifier = (request.getEmail() != null && !request.getEmail().isEmpty())
                 ? request.getEmail()
                 : request.getUsername();
@@ -54,7 +60,6 @@ public class UserService {
 
         Optional<User> userOpt;
 
-        // detect if identifier looks like an email
         if (identifier.contains("@")) {
             userOpt = userRepository.findByEmail(identifier);
         } else {
@@ -67,12 +72,15 @@ public class UserService {
             throw new RuntimeException("Invalid credentials");
         }
 
-        return new UserResponse(
+        String token = jwtUtil.generateToken(user.getUsername());
+
+        return new AuthResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getEmail()
+                user.getEmail(),
+                token
         );
     }
 
@@ -83,5 +91,4 @@ public class UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
-
 }

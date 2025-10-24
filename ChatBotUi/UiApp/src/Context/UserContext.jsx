@@ -6,19 +6,17 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Load user from localStorage on mount
+  // Load user on mount
   useEffect(() => {
     const existingUser = loadUser();
     if (existingUser) setUser(existingUser);
   }, []);
 
-  // Login: save user to state + localStorage
   const login = (userData) => {
     setUser(userData);
     saveUser(userData);
   };
 
-  // Logout: clear user from state + localStorage
   const logout = () => {
     setUser(null);
     clearUser();
@@ -31,5 +29,4 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// Hook to access user context
 export const useUser = () => useContext(UserContext);

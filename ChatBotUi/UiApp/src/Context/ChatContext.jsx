@@ -1,11 +1,13 @@
 import React, { createContext, useState, useEffect, useCallback, useContext, useRef } from "react";
 import { saveMessages, loadMessages, clearMessages } from "../Utils/Session/ChatStorage";
 import { ChatApi } from "../Utils/Api/ChatApi";
+import { useUser } from "./UserContext";
 import { v4 as uuidv4 } from "uuid";
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
+  const { user } = useUser();
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -22,6 +24,7 @@ export const ChatProvider = ({ children }) => {
       setMessages(normalized);
       saveMessages(normalized);
     }
+
     const storedSession = sessionStorage.getItem("chatSessionId");
     if (storedSession) setSessionId(storedSession);
   }, []);
@@ -56,6 +59,11 @@ export const ChatProvider = ({ children }) => {
       const aiMsg = { id: uuidv4(), sender: "ai", text: aiReply, createdAt: new Date().toISOString(), parentId: userMsg.id };
       setMessages(prev => { const next = [...prev, aiMsg]; saveMessages(next); return next; });
 
+      // ✅ For guest users: store only temporary chat
+      if (!user) {
+        sessionStorage.setItem("guestChat", JSON.stringify(next));
+      }
+
     } catch (error) {
       console.error("Backend error:", error.message);
       const fallback = { id: uuidv4(), sender: "ai", text: `⚠️ ${error.message}`, createdAt: new Date().toISOString() };
@@ -63,7 +71,7 @@ export const ChatProvider = ({ children }) => {
     } finally {
       setIsTyping(false);
     }
-  }, [sessionId]);
+  }, [sessionId, user]);
 
   const handleDeleteMessage = useCallback((messageId) => {
     setMessages(prev => {
@@ -90,8 +98,13 @@ export const ChatProvider = ({ children }) => {
   const handleSaveEdit = async () => { if (!editText.trim()) return; await handleSend(editText); setEditingMessageId(null); setEditText(""); };
 
   const handleNewChat = async () => {
-    setMessages([]); saveMessages([]); clearMessages(); sessionStorage.removeItem("chatSessionId");
-    const newSession = await createNewSession(); setSessionId(newSession);
+    setMessages([]);
+    saveMessages([]);
+    clearMessages();
+    sessionStorage.removeItem("chatSessionId");
+    if (!user) sessionStorage.removeItem("guestChat");
+    const newSession = await createNewSession();
+    setSessionId(newSession);
   };
 
   return (

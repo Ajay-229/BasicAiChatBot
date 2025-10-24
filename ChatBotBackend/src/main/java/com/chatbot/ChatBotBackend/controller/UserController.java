@@ -19,27 +19,29 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
 
+    // ✅ Signup with JWT
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
         try {
-            UserResponse response = userService.registerUser(request);
+            AuthResponse response = userService.registerUser(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    // ✅ Login with JWT
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            UserResponse response = userService.loginUser(request);
+            AuthResponse response = userService.loginUser(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    // ✅ Check username/email uniqueness
+    // ✅ Check username/email uniqueness — no changes
     @GetMapping("/check-unique")
     public ResponseEntity<Map<String, Object>> checkUnique(
             @RequestParam String field,
