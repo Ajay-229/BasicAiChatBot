@@ -11,5 +11,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRequest {
-    private List<Map<String, String>> messages; // [{role: "user", content: "..."}]
+    // For multi-message format: [{ "role": "user", "content": "..." }]
+    private List<Map<String, String>> messages;
+
+    // For simple format: { "sender": "user", "content": "Hello AI" }
+    private String sender;
+    private String content;
 }

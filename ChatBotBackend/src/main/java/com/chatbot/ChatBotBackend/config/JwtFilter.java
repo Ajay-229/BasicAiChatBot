@@ -2,6 +2,8 @@ package com.chatbot.ChatBotBackend.config;
 
 import com.chatbot.ChatBotBackend.model.User;
 import com.chatbot.ChatBotBackend.repository.UserRepository;
+import com.chatbot.ChatBotBackend.service.TokenBlacklistService;
+import com.chatbot.ChatBotBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +25,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -29,7 +34,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-
         String username = null;
         String token = null;
 
@@ -40,7 +44,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Optional<User> userOpt = userRepository.findByUsername(username);
-            if (userOpt.isPresent() && jwtUtil.validateToken(token)) {
+            if (userOpt.isPresent() &&
+                    jwtUtil.validateToken(token) &&
+                    !tokenBlacklistService.isBlacklisted(token) &&
+                    userService.isTokenActive(userOpt.get().getId(), token)) {
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userOpt.get(), null, null);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -7,7 +7,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -23,14 +25,27 @@ public class HuggingFaceClient {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(HF_API_TOKEN);
 
+            // -------------------------------
+            // Map ChatMessage → HF API format
+            // -------------------------------
+            List<Map<String, String>> formattedMessages = messages.stream()
+                    .map(msg -> Map.of(
+                            "role", msg.getSender(),   // "user" or "assistant"
+                            "content", msg.getContent() // message text
+                    ))
+                    .toList();
+
             Map<String, Object> body = new HashMap<>();
             body.put("model", "deepseek-ai/DeepSeek-V3.2-Exp:novita");
-            body.put("messages", messages);
+            body.put("messages", formattedMessages);
             body.put("stream", false);
 
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Map> response = restTemplate.exchange(
-                    HF_API_URL, HttpMethod.POST, new HttpEntity<>(body, headers), Map.class
+                    HF_API_URL,
+                    HttpMethod.POST,
+                    new HttpEntity<>(body, headers),
+                    Map.class
             );
 
             if (response.getBody() != null && response.getBody().containsKey("choices")) {

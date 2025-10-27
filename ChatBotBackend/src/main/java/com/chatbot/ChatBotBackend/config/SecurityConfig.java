@@ -21,7 +21,11 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**").permitAll()
+                // Public endpoints
+                .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/check-unique").permitAll()
+                // Delete user requires authentication
+                .requestMatchers("/api/auth/delete/**").authenticated()
+                // Future authenticated endpoints (chat etc.)
                 .requestMatchers("/api/chat/**").authenticated()
                 .anyRequest().authenticated()
                 .and()

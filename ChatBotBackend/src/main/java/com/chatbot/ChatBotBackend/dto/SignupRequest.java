@@ -1,7 +1,8 @@
 package com.chatbot.ChatBotBackend.dto;
 
+import lombok.Builder;
 import lombok.Data;
-
+@Builder
 @Data
 public class SignupRequest {
     private String username;
